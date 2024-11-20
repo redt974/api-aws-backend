@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+    - name: Update packages
+      apt:
+        update_cache: yes
+
+    - name: Install selected software
+      apt:
+        name: "{{ item }}"
+        state: latest
+      loop: "{{ software.split(',') }}"
