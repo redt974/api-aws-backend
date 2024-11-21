@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const db = require('../config/db');
 
 const secretKey = process.env.JWT_SECRET;
@@ -14,19 +15,54 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    // Vérification du token Remember Me
+    // Décodage et validation du token JWT
     const decoded = jwt.verify(rememberMeToken, refreshSecretKey);
-    const { userId, isAdmin } = decoded;
+    const { userId } = decoded;
 
-    // Vérifier si le token Remember Me est valide en base de données
-    const [user] = await db.query('SELECT id FROM utilisateurs WHERE remember_me_token = ?', [rememberMeToken]);
+    // Récupérer le hash du token et la date d'expiration en base
+    const [users] = await db.query(
+      'SELECT remember_me_token, remember_me_expiration FROM utilisateurs WHERE id = ?',
+      [userId]
+    );
 
-    if (user.length === 0) {
+    if (users.length === 0) {
+      return res.status(403).json({ message: 'Utilisateur non trouvé.' });
+    }
+
+    const user = users[0];
+
+    // Vérifier l'expiration du token
+    if (new Date() > new Date(user.remember_me_expiration)) {
+      return res.status(403).json({ message: 'Token Remember Me expiré.' });
+    }
+
+    // Comparer le token avec le hash en base
+    const isValidToken = await bcrypt.compare(rememberMeToken, user.remember_me_token);
+    if (!isValidToken) {
       return res.status(403).json({ message: 'Token Remember Me invalide.' });
     }
 
-    // Génération d'un nouveau token d'accès
-    const accessToken = jwt.sign({ userId, isAdmin }, secretKey, { expiresIn: '30m' });
+    // Générer un nouveau token d'accès
+    const accessToken = jwt.sign({ userId }, secretKey, { expiresIn: '30m' });
+
+    // Générer un nouveau token Remember Me
+    const newRememberMeToken = jwt.sign({ userId }, refreshSecretKey, { expiresIn: '7d' });
+    const newTokenHash = await bcrypt.hash(newRememberMeToken, 10);
+
+    // Mettre à jour le token Remember Me en base
+    const expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 jours
+    await db.query(
+      'UPDATE utilisateurs SET remember_me_token = ?, remember_me_expiration = ? WHERE id = ?',
+      [newTokenHash, expirationDate, userId]
+    );
+
+    // Envoyer le nouveau cookie Remember Me
+    res.cookie('rememberMeToken', newRememberMeToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+    });
 
     // Répondre avec le nouveau token d'accès
     return res.status(200).json({ token: accessToken });

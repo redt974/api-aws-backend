@@ -10,7 +10,10 @@ router.post('/', (req, res) => {
         return res.status(500).json({ message: 'Une erreur est survenue lors de la déconnexion.' });
       }
 
-      res.clearCookie('connect.sid'); // Supprimer le cookie de session
+      // Supprimer le cookie de session en toute sécurité
+      res.clearCookie('connect.sid', { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+
+      console.log(`Utilisateur déconnecté : ${req.session.email}`); // Ajouter un log pour la déconnexion
       return res.status(200).json({ message: 'Déconnexion réussie.' });
     });
   } else {

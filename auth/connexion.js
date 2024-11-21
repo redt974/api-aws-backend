@@ -25,22 +25,22 @@ router.post('/', async (req, res) => {
     await verifyCaptcha(captchaValue);
 
     // Recherche de l'utilisateur dans la base de données
-    const [user] = await db.query('SELECT id, password FROM utilisateurs WHERE email = $1', [email]);
-    if (user.length === 0) {
-      return res.status(401).json({ message: "Utilisateur non trouvé. Veuillez faire une demande d'inscription" });
+    const result = await db.query('SELECT id, password, sel FROM utilisateurs WHERE email = $1', [email]);
+    if (!result.rows || result.rows.length === 0) {
+      return res.status(401).json({ message: "Utilisateur non trouvé. Veuillez faire une demande d'inscription." });
     }
 
-    const { id: userId, password: mot_de_passe_hash } = userResult.rows[0];
+    const { id, password: mot_de_passe_hash, sel } = result.rows[0];
 
     // Vérification du mot de passe
-    const validPassword = await bcrypt.compare(mot_de_passe + sel, mot_de_passe_hash);
+    const validPassword = await bcrypt.compare(mot_de_passe + sel, mot_de_passe_hash); 
     if (!validPassword) {
       return res.status(401).json({ message: 'Mot de passe incorrect.' });
     }
 
     // Création des tokens
-    const accessToken = jwt.sign({ userId }, secretKey, { expiresIn: '30m' });
-    const refreshToken = jwt.sign({ userId }, refreshSecretKey, { expiresIn: '7d' });
+    const accessToken = jwt.sign({ id }, secretKey, { expiresIn: '30m' });
+    const refreshToken = jwt.sign({ id }, refreshSecretKey, { expiresIn: '7d' });
 
     // Stockage du refreshToken dans un cookie sécurisé
     res.cookie('refreshToken', refreshToken, {
@@ -52,8 +52,8 @@ router.post('/', async (req, res) => {
 
     // Gestion de l'option "Remember Me"
     if (rememberMe) {
-      const rememberMeToken = jwt.sign({ userId, isAdmin }, refreshSecretKey, { expiresIn: '30d' });
-      await db.query('UPDATE utilisateurs SET remember_me_token = $1 WHERE id = $2', [rememberMeToken, userId]);
+      const rememberMeToken = jwt.sign({ id }, refreshSecretKey, { expiresIn: '30d' });
+      await db.query('UPDATE utilisateurs SET remember_me_token = $1 WHERE id = $2', [rememberMeToken, id]);
       res.cookie('rememberMeToken', rememberMeToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -61,16 +61,6 @@ router.post('/', async (req, res) => {
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 jours en millisecondes
       });
     }
-
-    // Envoi de l'email de vérification
-    await sendEmail({
-        to: email,
-        subject: 'Nouvelle Connexion',
-        templateName: 'connexion',
-        variables: {
-            date: new Date().toLocaleString()
-        }
-        });
 
     // Connexion réussie
     return res.status(200).json({ message: 'Connexion réussie.', accessToken });

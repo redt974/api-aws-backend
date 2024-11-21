@@ -8,7 +8,7 @@ function validerEmail(email) {
 }
 
 // Fonction pour valider un mot de passe
-function validerMotDePasse(motDePasse) {
+function validerPassword(motDePasse) {
     const motDePasseRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$/;
     if (!motDePasseRegex.test(motDePasse)) {
         return { valid: false, message: "Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial." };
@@ -26,6 +26,7 @@ function validerLoginForm(formData) {
 }
 
 module.exports = {
-    validerMotDePasse,
+    validerEmail,
+    validerPassword,
     validerLoginForm
 };

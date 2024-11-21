@@ -15,7 +15,15 @@ const port = process.env.PORT || 3000;
 
 // Middlewares globaux
 app.use(bodyParser.json());
-app.use(cors());
+
+const corsOptions = {
+    origin: 'http://localhost:3000',  // Remplacez par l'URL de votre frontend (port du frontend React par exemple)
+    credentials: true,                // Permet l'envoi des cookies (ou autres informations d'authentification)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Méthodes HTTP autorisées
+};
+
+app.use(cors(corsOptions));  // Applique la configuration CORS avec les options définies
+
 
 // Routes de gestion pour l'authentification
 const inscriptionRoute = require('./auth/inscription');
@@ -34,19 +42,19 @@ const deleteVmRoute = require("./vm/delete-vm");
 
 
 // Routes pour l'authentification
-app.use('/api/inscription', inscriptionRoute);
-app.use('/api/connexion', connexionRoute);
-app.use('/api/deconnexion', authMiddleware, deconnexionRoute);
+app.use('/api/signup', inscriptionRoute);
+app.use('/api/signin', connexionRoute);
+app.use('/api/logout', authMiddleware, deconnexionRoute);
 
-app.use('/api/motdepasse_oublie', motDePasseOublieRoute);
-app.use('/reinitialisation', reinitialisationRoute);
+app.use('/api/forgot_mdp', motDePasseOublieRoute);
+app.use('/api/reset_mdp', reinitialisationRoute);
 
 app.use('/api/remember-me', rememberMeRoute);
 app.use('/api/refresh-token', refreshtokenRoute);
 
 // Routes pour les VMs
-app.use("/api/vm", createVmRoute);
-app.use("/api/vm", deleteVmRoute);
+app.use("/api/vm", authMiddleware, createVmRoute);
+app.use("/api/vm", authMiddleware, deleteVmRoute);
 
 // Supprimer une VM automatiquement après expiration
 async function cleanupExpiredVMs() {

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Votre mot de passe a été modifié</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #333;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #ffffff;
+      background-color: #1a73e8;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    .button:hover {
+      background-color: #0c5d9b;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Votre mot de passe a été modifié</h1>
+    <p>Bonjour,</p>
+    <p>Nous vous informons que votre mot de passe a été modifié avec succès.</p>
+    <p>Vous pouvez maintenant vous connecter à votre compte en utilisant le lien ci-dessous :</p>
+    <a href="{{connexionLien}}" class="button">Se connecter</a>
+    <p>Si vous avez des questions ou avez besoin d'aide, n'hésitez pas à nous contacter :</p>
+    <div class="footer">
+      <p>Merci de votre confiance.</p>
+      <p>L'équipe de support</p>
+    </div>
+  </div>
+</body>
+</html>

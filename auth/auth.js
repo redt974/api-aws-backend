@@ -8,12 +8,19 @@ const generateToken = (user) => {
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.sendStatus(401);
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token manquant. Veuillez vous connecter.' });
+  }
 
   jwt.verify(token, secret, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
+    if (err) {
+      // Vérification si le token a expiré ou s'il est invalide
+      return res.status(403).json({ message: 'Token invalide ou expiré. Veuillez vous reconnecter.' });
+    }
+
+    req.user = user;  // Attacher l'utilisateur à la requête
+    next();  // Passer au middleware suivant
   });
 };
 
