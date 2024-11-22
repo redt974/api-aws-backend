@@ -1,109 +1,79 @@
-# Backend - Application "Je suis l'Autre"
+# API AWS Backend
 
-Ce projet est le backend de l'application "Je suis l'Autre". Il est construit avec Node.js et Express et utilise MySQL pour la base de données.
+Cette API fournit des fonctionnalités pour la gestion des utilisateurs, l'authentification, la création et la gestion des machines virtuelles (VM), ainsi que des outils de gestion d'infrastructure via Terraform et Ansible.
 
 ## Prérequis
 
-- Node.js (version 14 ou supérieure)
-- MySQL
-- npm (ou yarn)
+1. **Node.js** : Assurez-vous d'avoir Node.js installé sur votre machine. Vous pouvez vérifier la version avec :
+   ```
+   node -v
+   ```
+2. **Base de données** : Le projet utilise une base de données (à configurer via `config/db.js`). Assurez-vous que votre base de données est accessible.
+
+3. **Variables d'environnement** : Utilisez un fichier `.env` pour définir les variables nécessaires (par exemple, les informations de connexion à la base de données et les secrets JWT). Un exemple de fichier `.env` peut être fourni :
+
+   ```
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASS=password
+   JWT_SECRET=secretKey
+   JWT_EXPIRATION=3600
+   ```
 
 ## Installation
 
-1. Clonez le dépôt :
+1. Clonez ou téléchargez le projet.
+2. Accédez au dossier du projet :
+   ```
+   cd C:\Users\vandi\Downloads\api-aws-backend
+   ```
+3. Installez les dépendances :
+   ```
+   npm install
+   ```
 
-```bash
-git clone https://github.com/redt974/Je-suis-l-Autre-backend.git backend
-cd backend
+## Lancer l'application
+
+Après avoir installé les dépendances, lancez le serveur avec la commande suivante :
 ```
-
-2. Installez les dépendances :
-
-```bash
-npm install
-```
-
-3. Renommer le fichier `.env-default` en fichier `.env` à la racine du projet et en y ajoutant les informations nécessaires.
-
-
-4. Démarrez le serveur :
-
-```bash
 npm start
 ```
 
-## Routes disponibles :
+Cela démarrera le serveur sur le port par défaut (3000) ou celui défini dans vos variables d'environnement.
 
-### Routes pour l'authentification
+## Description des principales fonctionnalités
 
-- `POST /demandes` : Demandes d'inscription.
-- `POST /inscription` : Inscription d'un nouvel utilisateur.
-- `POST /connexion` : Connexion d'un utilisateur.
-- `GET /deconnexion` : Déconnexion de l'utilisateur.
-- `POST /motdepasse_oublie` : Demande de réinitialisation de mot de passe.
-- `POST /reinitialisation` : Réinitialisation du mot de passe.
+### 1. **Authentification**
+   - **Routes disponibles** : `/api/signup`, `/api/signin`, `/api/logout`, `/api/forgot_mdp`, `/api/reset_mdp`, `/api/refresh-token`, `/api/remember-me`
+   - **Middleware** : Le projet utilise des middlewares JWT pour la gestion des sessions utilisateurs, avec la possibilité de vérifier un `refreshToken` pour rafraîchir le token d'accès expiré.
+   
+### 2. **Gestion des VMs**
+   - **Routes disponibles** : `/api/vm/create`, `/api/vm/delete`, `/api/vm/download-vpn`, `/api/vm/windows-password`
+   - **Terraform et Ansible** : Le projet intègre des scripts Terraform et Ansible pour la gestion des infrastructures et la création de VMs. 
 
-### Routes pour l'authentification avec Google
+### 3. **Sécurisation**
+   - **JWT** : Utilisation de JWT pour l'authentification des utilisateurs. Le token d'accès est stocké dans `localStorage` et peut être rafraîchi à l'aide d'un `refreshToken`.
+   - **CORS** : Le projet gère les appels cross-origin avec des configurations CORS définies dans le fichier `index.js`.
 
-- `POST /google/request`: Initialisation de la demande de connexion à l'API de Google
-- `POST /google/oauth`: Récupération des informations permettant l'authentification
+### 4. **Envoi de mails**
+   - **Gmail service** : Le projet inclut un service d'envoi de mails via Gmail pour des fonctionnalités telles que la réinitialisation de mot de passe.
 
-### Routes pour la reconnexion, maintien de la connexion
+## Fonctionnalités supplémentaires
 
-- `POST /remember-me`: Demande de token Remember Me.
-- `POST /refresh-token`: Demande de token Refresh Token.
-- `GET /verify`: Vérification de la  sur un autre navigateur ou ordinateur.
+- **Routage sécurisé** : Le middleware d'authentification protège certaines routes afin qu'elles ne soient accessibles que par des utilisateurs authentifiés.
+- **Gestion de l'infrastructure avec Terraform et Ansible** : Utilisation d'Ansible pour installer des logiciels et de Terraform pour gérer les machines virtuelles.
+  
+## Test et Débogage
 
-### Routes protégées par l'authentification
+1. **Exécution en mode développement** : 
+   - Définissez votre environnement comme "development" dans le fichier `.env` et lancez le serveur en mode débogage.
+2. **Logs** : Le serveur journalise toutes les erreurs et les requêtes dans la console. Vérifiez les logs pour obtenir des informations détaillées sur les erreurs.
 
-- `GET /user`: Pour avoir les informations sur les utilisateurs.
+## Scripts disponibles
 
-### Routes pour l'administration
+- **`npm start`** : Démarre le serveur en mode production.
+- **`npm run dev`** : Démarre le serveur en mode développement (avec `nodemon` pour un rechargement automatique).
 
-- `GET /admin/utilisateurs`: Pour avoir les informations sur tous les utilisateurs.
-- `GET /admin/excel`: Téléchargement des informations sous forme de Tableau Excel.
-- `POST /admin/newsletter`: Création de mail pour la newsletter.
+## Contributions
 
-### Routes pour l'adhésion
-
-- `POST /adhesion`: Inscription des adhérents 
-
-### Routes pour le paiement
-
-#### PayPal :
-
-- `POST /paypal/orders`: Initialisation de la commande à l'API de PayPal
-- `POST /paypal/orders/:orderId/capture`: Récupération des informations du paiement effectué
-
-#### Hello Asso :
-
-- `POST /helloasso/checkout-intent`: Initialisation de la commande à l'API de Hello Asso
-- `POST /helloasso/checkout-intent/:checkoutIntentId`: Récupération des informations du paiement effectué 
-
-### Route pour la newsletter
-
-- `POST /abonnement`: Demande d'abonnement à la newsletter
-- `POST /desabonnement`: Demande d'désabonnement à la newsletter
-
-### Autres Routes :
-
-- `POST /contact`: Contact par mail
-
-## Services
-
-- [MySQL](https://www.mysql.com/fr/)
-- [Gmail](https://www.google.com/intl/fr/gmail/about/)
-- [Captcha](https://www.google.com/recaptcha/about/)
-- [Google OAuth API](https://developers.google.com/identity/protocols/oauth2?hl=fr) :
-    - API : https://www.googleapis.com/oauth2/
-- [PayPal API](https://developer.paypal.com/dashboard/) :
-    - Sandbox: https://api-m.sandbox.paypal.com
-    - Live: https://api-m.paypal.com
-- [Hello Asso API](https://dev.helloasso.com/) :
-    - Sandbox : https://www.helloasso-sandbox.com/
-    - Live : https://api.helloasso.com
-
-## Sécurité
-
-- Assurez-vous de configurer correctement les variables d'environnement.
-- Utilisez les certificats HTTPS pour sécuriser les communications entre le client et le serveur.
+Les contributions au projet sont les bienvenues. Veuillez créer une branche pour toute nouvelle fonctionnalité ou correction de bug et soumettre une demande de fusion.
