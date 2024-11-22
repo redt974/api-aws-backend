@@ -13,20 +13,6 @@ const pool = new Pool({
 // Initialisation des tables
 (async () => {
   try {
-    // Création de la table `vms`
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS vms (
-        id SERIAL PRIMARY KEY,
-        os VARCHAR(50) NOT NULL,
-        software TEXT,
-        public_ip VARCHAR(50),
-        private_key TEXT,
-        created_at TIMESTAMP DEFAULT NOW(),
-        expires_at TIMESTAMP
-      )
-    `);
-    console.log("Table VMs initialisée.");
-
     // Création de la table `utilisateurs` avec le champ sel
     await pool.query(`
       CREATE TABLE IF NOT EXISTS utilisateurs (
@@ -41,6 +27,23 @@ const pool = new Pool({
       )
     `);
     console.log("Table Utilisateurs initialisée.");
+
+    // Création de la table `vms` 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS vms (
+        id SERIAL PRIMARY KEY,                -- ID unique pour chaque VM
+        user_id INT NOT NULL,                 -- Clé étrangère vers la table utilisateurs
+        os VARCHAR(50) NOT NULL,              -- Système d'exploitation
+        software TEXT,                        -- Logiciels installés
+        public_ip VARCHAR(50),                -- Adresse IP publique
+        private_key TEXT,                     -- Clé privée pour l'accès SSH
+        vpn_config TEXT,                      -- Chemin vers le fichier de configuration VPN
+        created_at TIMESTAMP DEFAULT NOW(),   -- Date de création
+        expires_at TIMESTAMP,                 -- Date d'expiration
+        FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE -- Clé étrangère vers utilisateurs
+      )
+    `);
+    console.log("Table VMs initialisée.");
 
     // Création de la table `reset_tokens`
     await pool.query(`

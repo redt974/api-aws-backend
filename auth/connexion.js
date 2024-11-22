@@ -4,8 +4,6 @@ const db = require('../config/db');
 const { verifyCaptcha } = require('../services/captcha');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const { sendEmail } = require('../services/gmail');
 const { validerLoginForm } = require('./validation');
 
 const secretKey = process.env.JWT_SECRET;
@@ -39,7 +37,7 @@ router.post('/', async (req, res) => {
     }
 
     // Création des tokens
-    const accessToken = jwt.sign({ id }, secretKey, { expiresIn: '30m' });
+    const accessToken = jwt.sign({ id }, secretKey, { expiresIn: '1m' });
     const refreshToken = jwt.sign({ id }, refreshSecretKey, { expiresIn: '7d' });
 
     // Stockage du refreshToken dans un cookie sécurisé

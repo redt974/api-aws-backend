@@ -1,24 +1,27 @@
 const express = require("express");
 const router = express.Router();
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
 const crypto = require("crypto");
-const pool = require("../config/db"); 
-const { Client } = require("ssh2"); 
-
-// Génération d'une clé SSH dynamique
-function generateSSHKey() {
-  const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
-    modulusLength: 2048,
-    publicKeyEncoding: { type: "spki", format: "pem" },
-    privateKeyEncoding: { type: "pkcs8", format: "pem" },
-  });
-  return { publicKey, privateKey };
-}
+const path = require("path");
+const fs = require("fs");
+const { exec } = require("child_process");
+const { generateSSHKey } = require("./ssh");
+const { getUserEmail, getUserIdFromToken } = require("../auth/user");
+const { createTerraformConfig, runTerraform } = require("./terraform");
+const { generateAnsibleInventory, runAnsiblePlaybook } = require("./ansible");
+const pool = require("../config/db");
 
 router.post("/create", async (req, res) => {
-  const { os, software, extensions } = req.body; // Ajout du paramètre extensions
+  const { os, software, extensions, user_name, user_password } = req.body;
+
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(400).send("Token d'accès manquant.");
+
+  const userId = getUserIdFromToken(token);
+  if (!userId) return res.status(401).send("Token invalide ou expiré.");
+
+  const userEmail = await getUserEmail(userId);
+  if (!userEmail) return res.status(404).send("Utilisateur non trouvé.");
+
   const ami = {
     Ubuntu: process.env.AMI_UBUNTU,
     Debian: process.env.AMI_DEBIAN,
@@ -30,119 +33,71 @@ router.post("/create", async (req, res) => {
   if (!ami) return res.status(400).send("OS non pris en charge.");
 
   try {
-    const existingVM = await pool.query("SELECT COUNT(*) FROM vms WHERE expires_at > NOW()");
+    const existingVM = await pool.query(
+      "SELECT COUNT(*) FROM vms WHERE user_id = $1 AND expires_at > NOW()",
+      [userId]
+    );
     if (parseInt(existingVM.rows[0].count) >= 1) {
       return res.status(400).send("Vous avez déjà une VM active.");
     }
 
-    const { publicKey, privateKey } = generateSSHKey();
-    fs.writeFileSync("keys/ssh_key.pem", privateKey);
+    // Création du répertoire utilisateur pour Terraform
+    const userDir = path.join(
+      __dirname,
+      "../terraform",
+      `${userEmail}-vm-${crypto.randomBytes(3).toString("hex")}`
+    );
+    fs.mkdirSync(userDir, { recursive: true });
 
-    const tfConfig = `
-provider "aws" {
-  region = "${process.env.AWS_REGION}"
-}
+    const vmName = path.basename(userDir);
+    const { privateKeyPath, publicKeyPath } = generateSSHKey(vmName, userDir);
 
-resource "aws_instance" "vm" {
-  ami           = "${ami}"
-  instance_type = "${process.env.INSTANCE_TYPE}"
-  key_name      = "dynamic-key"
-  tags = {
-    Name = "custom-vm"
-  }
-}
+    const tfConfigPath = path.join(userDir, "main.tf");
+    createTerraformConfig(ami, vmName, publicKeyPath, tfConfigPath);
 
-output "public_ip" {
-  value = aws_instance.vm.public_ip
-}
-    `;
+    const { publicIp, instanceId } = await runTerraform(userDir);
 
-    const terraformConfigPath = path.join(__dirname, "../terraform/generated/vm-config.tf");
-    fs.writeFileSync(terraformConfigPath, tfConfig);
+    // Génération du chemin vers le modèle de configuration VPN
+    const vpnConfigTemplatePath = path.join(__dirname, "../templates/server.conf.j2");
 
-    exec("cd terraform && terraform init && terraform apply -auto-approve", async (err, stdout) => {
-      if (err) {
-        console.error(`Erreur Terraform : ${err.message}`);
-        return res.status(500).send("Erreur lors de la création de la VM.");
-      }
+    // Génération de l'inventaire pour Ansible
+    const inventoryPath = path.join(userDir, "inventory");
+    await generateAnsibleInventory(
+      { public_ip: publicIp, ssh_private_key_path: privateKeyPath },
+      inventoryPath
+    );
 
-      const ipMatch = stdout.match(/public_ip = "(.*)"/);
-      const publicIp = ipMatch ? ipMatch[1] : null;
+    // Exécution du playbook Ansible avec les paramètres nécessaires
+    await runAnsiblePlaybook(
+      inventoryPath,
+      software,
+      extensions,
+      vpnConfigTemplatePath,
+      userEmail,
+      user_name, // Passer le nom d'utilisateur
+      user_password // Passer le mot de passe
+    );
 
-      if (!publicIp) return res.status(500).send("Erreur lors de la récupération de l'adresse IP.");
+    // Calcul de la date d'expiration de la VM
+    const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000);
 
-      const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000); // 12h
-      const result = await pool.query(
-        "INSERT INTO vms (os, software, public_ip, private_key, expires_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-        [os, software, publicIp, privateKey, expiresAt]
-      );
+    // Enregistrement de la VM en base de données
+    const result = await pool.query(
+      "INSERT INTO vms (user_id, os, software, public_ip, private_key, expires_at, name, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
+      [userId, os, software, publicIp, privateKeyPath, expiresAt, vmName, instanceId]
+    );
 
-      // Installer VSCode et les extensions sur la VM
-      installVSCodeAndExtensions(publicIp, privateKey, extensions);
-
-      res.status(201).json({
-        message: "VM créée avec succès.",
-        vm_id: result.rows[0].id,
-        public_ip: publicIp,
-        ssh_private_key: privateKey,
-      });
+    res.status(201).json({
+      message: "VM créé avec succès.",
+      vm_id: result.rows[0].id,
+      public_ip: publicIp,
+      ssh_private_key: privateKeyPath,
+      instance_id: instanceId,
     });
   } catch (err) {
     console.error("Erreur lors de la création de la VM :", err.message);
     res.status(500).send("Erreur interne du serveur.");
   }
 });
-
-// Fonction pour installer VSCode et les extensions sur la VM
-function installVSCodeAndExtensions(ip, privateKey, extensions) {
-  const sshClient = new Client();
-  sshClient.on("ready", () => {
-    console.log("SSH connecté à la VM.");
-
-    // Installation de VSCode sur une VM Ubuntu/Debian
-    const installVSCodeCmd = `
-      sudo apt update && sudo apt install -y wget gpg
-      wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor > /usr/share/keyrings/microsoft-archive-keyring.gpg
-      sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
-      sudo apt update
-      sudo apt install -y code
-    `;
-
-    sshClient.exec(installVSCodeCmd, (err, stream) => {
-      if (err) {
-        console.error("Erreur lors de l'installation de VSCode:", err);
-        return;
-      }
-
-      stream.on("close", async () => {
-        console.log("VSCode installé.");
-
-        // Installation des extensions VSCode si spécifiées
-        if (extensions && extensions.length > 0) {
-          const installExtensionsCmd = extensions.map(ext => `code --install-extension ${ext}`).join(' && ');
-
-          sshClient.exec(installExtensionsCmd, (err, stream) => {
-            if (err) {
-              console.error("Erreur lors de l'installation des extensions:", err);
-              return;
-            }
-
-            stream.on("close", () => {
-              console.log("Extensions VSCode installées.");
-              sshClient.end();
-            });
-          });
-        } else {
-          sshClient.end();
-        }
-      });
-    });
-  }).connect({
-    host: ip,
-    port: 22,
-    username: "ubuntu",
-    privateKey: fs.readFileSync("ssh_key.pem")
-  });
-}
 
 module.exports = router;

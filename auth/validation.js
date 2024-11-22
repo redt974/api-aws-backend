@@ -19,7 +19,7 @@ function validerPassword(motDePasse) {
 // Fonction pour valider un formulaire de connexion
 function validerLoginForm(formData) {
     const emailValidation = validerEmail(formData.email);
-    const passwordValidation = validerMotDePasse(formData.mot_de_passe);
+    const passwordValidation = validerPassword(formData.mot_de_passe);
     return emailValidation.valid && passwordValidation.valid
         ? { valid: true }
         : { valid: false, message: emailValidation.message || passwordValidation.message };

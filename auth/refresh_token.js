@@ -8,7 +8,7 @@ const refreshSecretKey = process.env.REFRESH_JWT_SECRET;
 
 // Route pour rafraîchir le token d'accès
 router.post('/', async (req, res) => {
-  const refreshToken = req.cookies.refreshToken; // Récupérer le refresh token à partir du cookie
+  const refreshToken = req.cookies?.refreshToken; // Récupérer le refresh token à partir du cookie
 
   if (!refreshToken) {
     return res.status(400).json({ message: 'Refresh token manquant.' });
@@ -30,12 +30,6 @@ router.post('/', async (req, res) => {
 
       // Générer un nouveau refresh token
       const newRefreshToken = jwt.sign({ userId }, refreshSecretKey, { expiresIn: '7d' });
-
-      // Supprimer l'ancien refresh token de la base de données (optionnel)
-      await db.query('DELETE FROM refresh_tokens WHERE token = ?', [refreshToken]);
-
-      // Enregistrer le nouveau refresh token
-      await db.query('INSERT INTO refresh_tokens (token, utilisateur_id) VALUES (?, ?)', [newRefreshToken, userId]);
 
       // Envoyer le nouveau refresh token dans un cookie HttpOnly
       res.cookie('refreshToken', newRefreshToken, {

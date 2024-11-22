@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { exec } = require("child_process");
-const pool = require("./config/db"); 
+const pool = require("./config/db");
 
 // Middleware d'authentification JWT
 const authMiddleware = require('./auth/middleware');
@@ -17,7 +17,7 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 const corsOptions = {
-    origin: 'http://localhost:3000',  // Remplacez par l'URL de votre frontend (port du frontend React par exemple)
+    origin: 'http://localhost:3000',  // FRONTEND
     credentials: true,                // Permet l'envoi des cookies (ou autres informations d'authentification)
     methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Méthodes HTTP autorisées
 };
@@ -38,8 +38,9 @@ const rememberMeRoute = require('./auth/rememberme');
 
 // Routes de gestion des VMs
 const createVmRoute = require("./vm/create-vm");
+const windowspasswordRoute = require("./vm/windows-password");
+const downloadVPNRoute = require("./vm/download-vpn");
 const deleteVmRoute = require("./vm/delete-vm");
-
 
 // Routes pour l'authentification
 app.use('/api/signup', inscriptionRoute);
@@ -54,6 +55,8 @@ app.use('/api/refresh-token', refreshtokenRoute);
 
 // Routes pour les VMs
 app.use("/api/vm", authMiddleware, createVmRoute);
+app.use("/api/vm", authMiddleware, windowspasswordRoute);
+app.use("/api/vm", authMiddleware, downloadVPNRoute);
 app.use("/api/vm", authMiddleware, deleteVmRoute);
 
 // Supprimer une VM automatiquement après expiration
@@ -76,6 +79,6 @@ async function cleanupExpiredVMs() {
 
 // Lancement du serveur
 app.listen(port, () => {
-  console.log(`Serveur lancé sur le port ${port}`);
-  setInterval(cleanupExpiredVMs, 60 * 60 * 1000); // Vérifie les VM expirées toutes les heures
+    console.log(`Serveur lancé sur le port ${port}`);
+    setInterval(cleanupExpiredVMs, 60 * 60 * 1000); // Vérifie les VM expirées toutes les heures
 });
