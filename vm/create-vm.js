@@ -3,14 +3,28 @@ const router = express.Router();
 const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
-const { exec } = require("child_process");
-const { generateSSHKey } = require("./ssh");
+const Joi = require("joi");
 const { getUserEmail, getUserIdFromToken } = require("../auth/user");
 const { createTerraformConfig, runTerraform } = require("./terraform");
 const { generateAnsibleInventory, runAnsiblePlaybook } = require("./ansible");
 const pool = require("../config/db");
 
 router.post("/create", async (req, res) => {
+  // Validation des données d'entrée
+  const vmSchema = Joi.object({
+    os: Joi.string().required(),
+    software: Joi.array().items(Joi.string()).required(),
+    extensions: Joi.array().items(Joi.string()).optional(),
+    user_name: Joi.string().optional(),
+    user_password: Joi.string().optional(),
+  });
+
+  const { error } = vmSchema.validate(req.body);
+  if (error)
+    return res
+      .status(400)
+      .send(`Erreur de validation : ${error.details[0].message}`);
+
   const { os, software, extensions, user_name, user_password } = req.body;
 
   const token = req.headers.authorization?.split(" ")[1];
@@ -41,7 +55,6 @@ router.post("/create", async (req, res) => {
       return res.status(400).send("Vous avez déjà une VM active.");
     }
 
-    // Création du répertoire utilisateur pour Terraform
     const userDir = path.join(
       __dirname,
       "../terraform",
@@ -50,45 +63,53 @@ router.post("/create", async (req, res) => {
     fs.mkdirSync(userDir, { recursive: true });
 
     const vmName = path.basename(userDir);
-    const { privateKeyPath, publicKeyPath } = generateSSHKey(vmName, userDir);
 
     const tfConfigPath = path.join(userDir, "main.tf");
-    createTerraformConfig(ami, vmName, publicKeyPath, tfConfigPath);
+    createTerraformConfig(ami, vmName, tfConfigPath);
 
-    const { publicIp, instanceId } = await runTerraform(userDir);
+    const { publicIp, instanceId, privateKey } = await runTerraform(userDir);
 
-    // Génération du chemin vers le modèle de configuration VPN
-    const vpnConfigTemplatePath = path.join(__dirname, "../templates/server.conf.j2");
+    if (!publicIp || !instanceId || !privateKey) {
+      throw new Error("Les sorties Terraform sont incomplètes ou incorrectes.");
+    }
 
-    // Génération de l'inventaire pour Ansible
+    const privateKeyPath = path.join(userDir, "id_rsa");
+    fs.writeFileSync(privateKeyPath, privateKey, { mode: 0o600 });
+
     const inventoryPath = path.join(userDir, "inventory");
     await generateAnsibleInventory(
       { public_ip: publicIp, ssh_private_key_path: privateKeyPath },
       inventoryPath
     );
 
-    // Exécution du playbook Ansible avec les paramètres nécessaires
     await runAnsiblePlaybook(
       inventoryPath,
       software,
       extensions,
-      vpnConfigTemplatePath,
+      null,
       userEmail,
-      user_name, // Passer le nom d'utilisateur
-      user_password // Passer le mot de passe
+      user_name,
+      user_password
     );
 
-    // Calcul de la date d'expiration de la VM
     const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000);
 
-    // Enregistrement de la VM en base de données
     const result = await pool.query(
       "INSERT INTO vms (user_id, os, software, public_ip, private_key, expires_at, name, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-      [userId, os, software, publicIp, privateKeyPath, expiresAt, vmName, instanceId]
+      [
+        userId,
+        os,
+        software,
+        publicIp,
+        privateKeyPath,
+        expiresAt,
+        vmName,
+        instanceId,
+      ]
     );
 
     res.status(201).json({
-      message: "VM créé avec succès.",
+      message: "VM créée avec succès.",
       vm_id: result.rows[0].id,
       public_ip: publicIp,
       ssh_private_key: privateKeyPath,

@@ -28,7 +28,7 @@ const pool = new Pool({
     `);
     console.log("Table Utilisateurs initialisée.");
 
-    // Création de la table `vms` 
+    // Création de la table `vms`
     await pool.query(`
       CREATE TABLE IF NOT EXISTS vms (
         id SERIAL PRIMARY KEY,                -- ID unique pour chaque VM
@@ -38,6 +38,8 @@ const pool = new Pool({
         public_ip VARCHAR(50),                -- Adresse IP publique
         private_key TEXT,                     -- Clé privée pour l'accès SSH
         vpn_config TEXT,                      -- Chemin vers le fichier de configuration VPN
+        name VARCHAR(255) NOT NULL,           -- Nom unique de la VM
+        instance_id VARCHAR(50),              -- ID de l'instance dans AWS
         created_at TIMESTAMP DEFAULT NOW(),   -- Date de création
         expires_at TIMESTAMP,                 -- Date d'expiration
         FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE -- Clé étrangère vers utilisateurs

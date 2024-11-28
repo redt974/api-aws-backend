@@ -2,51 +2,109 @@ const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
 
-function createTerraformConfig(ami, vmName, publicKey, outputPath) {
+function createTerraformConfig(ami, vmName, outputPath) {
   const config = `
 provider "aws" {
   region = "${process.env.AWS_REGION}"
 }
+
+resource "tls_private_key" "vm_key" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+resource "aws_key_pair" "key" {
+  key_name   = "${vmName}-key"
+  public_key = tls_private_key.vm_key.public_key_openssh
+}
+
 resource "aws_instance" "vm" {
   ami           = "${ami}"
   instance_type = "${process.env.INSTANCE_TYPE}"
-  key_name      = "${vmName}-key"
+  key_name      = aws_key_pair.key.key_name
   tags = {
     Name = "${vmName}"
   }
 }
-resource "aws_key_pair" "key" {
-  key_name   = "${vmName}-key"
-  public_key = <<EOF
-${fs.readFileSync(publicKey).toString()}
-EOF
-}
+
 output "public_ip" {
   value = aws_instance.vm.public_ip
 }
+
 output "instance_id" {
   value = aws_instance.vm.id
 }
+
+output "private_key_pem" {
+  value     = tls_private_key.vm_key.private_key_pem
+  sensitive = true
+}
 `;
-  fs.writeFileSync(outputPath, config);
+  fs.writeFileSync(outputPath, config, "utf8");
 }
 
 async function runTerraform(directory) {
   return new Promise((resolve, reject) => {
-    exec(`cd ${directory} && terraform init && terraform apply -auto-approve`, (err, stdout) => {
-      if (err) {
-        console.error(`Erreur Terraform : ${err.message}`);
-        return reject(err);
+    exec(
+      `cd ${directory} && terraform init && terraform apply -auto-approve`,
+      (err, stdout, stderr) => {
+        if (err) {
+          console.error(`Erreur Terraform : ${stderr}`);
+          return reject(err);
+        }
+
+        console.log("Terraform stdout:", stdout); // Log des sorties pour débogage
+
+        // Extraction des outputs non sensibles
+        const ipMatch = stdout.match(/public_ip\s*=\s*"([^"]+)"/);
+        const instanceIdMatch = stdout.match(/instance_id\s*=\s*"([^"]+)"/);
+
+        const publicIp = ipMatch ? ipMatch[1] : null;
+        const instanceId = instanceIdMatch ? instanceIdMatch[1] : null;
+
+        if (!publicIp || !instanceId) {
+          console.error("Erreur : Les sorties Terraform sont incomplètes.");
+          return reject(new Error("Erreur dans les sorties Terraform"));
+        }
+
+        // Exécuter terraform output pour récupérer les valeurs sensibles
+        exec(
+          `cd ${directory} && terraform output -json`,
+          (outputErr, outputStdout, outputStderr) => {
+            if (outputErr) {
+              console.error(
+                `Erreur lors de la récupération des outputs : ${outputStderr}`
+              );
+              return reject(outputErr);
+            }
+
+            try {
+              const outputs = JSON.parse(outputStdout);
+              const privateKey = outputs.private_key_pem?.value || null;
+
+              if (!privateKey) {
+                console.error(
+                  "Erreur : La clé privée est introuvable dans les outputs Terraform."
+                );
+                return reject(
+                  new Error(
+                    "Erreur dans les sorties Terraform (private_key_pem manquant)"
+                  )
+                );
+              }
+
+              resolve({ publicIp, instanceId, privateKey });
+            } catch (parseError) {
+              console.error(
+                "Erreur lors du parsing des outputs Terraform :",
+                parseError.message
+              );
+              reject(parseError);
+            }
+          }
+        );
       }
-      const ipMatch = stdout.match(/public_ip = "(.*)"/);
-      const publicIp = ipMatch ? ipMatch[1] : null;
-
-      const instanceIdMatch = stdout.match(/instance_id = "(.*)"/);
-      const instanceId = instanceIdMatch ? instanceId[1] : null;
-
-      if (!publicIp || !instanceId) reject(new Error("Erreur dans les sorties Terraform"));
-      resolve({ publicIp, instanceId });
-    });
+    );
   });
 }
 
