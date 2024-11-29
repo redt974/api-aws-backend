@@ -3,30 +3,15 @@ const router = express.Router();
 const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
-const Joi = require("joi");
 const { getUserEmail, getUserIdFromToken } = require("../auth/user");
 const { createTerraformConfig, runTerraform } = require("./terraform");
 const { generateAnsibleInventory, runAnsiblePlaybook } = require("./ansible");
 const pool = require("../config/db");
 
 router.post("/create", async (req, res) => {
-  // Validation des données d'entrée
-  const vmSchema = Joi.object({
-    os: Joi.string().required(),
-    software: Joi.array().items(Joi.string()).required(),
-    extensions: Joi.array().items(Joi.string()).optional(),
-    user_name: Joi.string().optional(),
-    user_password: Joi.string().optional(),
-  });
-
-  const { error } = vmSchema.validate(req.body);
-  if (error)
-    return res
-      .status(400)
-      .send(`Erreur de validation : ${error.details[0].message}`);
-
   const { os, software, extensions, user_name, user_password } = req.body;
-
+  
+  // Vérification du token d'accès
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(400).send("Token d'accès manquant.");
 
@@ -36,6 +21,7 @@ router.post("/create", async (req, res) => {
   const userEmail = await getUserEmail(userId);
   if (!userEmail) return res.status(404).send("Utilisateur non trouvé.");
 
+  // Vérification de l'OS
   const ami = {
     Ubuntu: process.env.AMI_UBUNTU,
     Debian: process.env.AMI_DEBIAN,
@@ -47,6 +33,7 @@ router.post("/create", async (req, res) => {
   if (!ami) return res.status(400).send("OS non pris en charge.");
 
   try {
+    // Vérification des VMs actives de l'utilisateur
     const existingVM = await pool.query(
       "SELECT COUNT(*) FROM vms WHERE user_id = $1 AND expires_at > NOW()",
       [userId]
@@ -55,6 +42,7 @@ router.post("/create", async (req, res) => {
       return res.status(400).send("Vous avez déjà une VM active.");
     }
 
+    // Création du dossier utilisateur
     const userDir = path.join(
       __dirname,
       "../terraform",
@@ -65,23 +53,29 @@ router.post("/create", async (req, res) => {
     const vmName = path.basename(userDir);
 
     const tfConfigPath = path.join(userDir, "main.tf");
+
+    // Création du fichier Terraform
     createTerraformConfig(ami, vmName, tfConfigPath);
 
+    // Exécution de Terraform
     const { publicIp, instanceId, privateKey } = await runTerraform(userDir);
 
     if (!publicIp || !instanceId || !privateKey) {
       throw new Error("Les sorties Terraform sont incomplètes ou incorrectes.");
     }
 
+    // Sauvegarde de la clé privée
     const privateKeyPath = path.join(userDir, "id_rsa");
     fs.writeFileSync(privateKeyPath, privateKey, { mode: 0o600 });
 
+    // Création de l'inventaire Ansible
     const inventoryPath = path.join(userDir, "inventory");
     await generateAnsibleInventory(
       { public_ip: publicIp, ssh_private_key_path: privateKeyPath },
       inventoryPath
     );
 
+    // Exécution du playbook Ansible
     await runAnsiblePlaybook(
       inventoryPath,
       software,
@@ -92,20 +86,11 @@ router.post("/create", async (req, res) => {
       user_password
     );
 
-    const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000);
-
+    // Insertion dans la base de données
+    const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000); // Expiration dans 12 heures
     const result = await pool.query(
       "INSERT INTO vms (user_id, os, software, public_ip, private_key, expires_at, name, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-      [
-        userId,
-        os,
-        software,
-        publicIp,
-        privateKeyPath,
-        expiresAt,
-        vmName,
-        instanceId,
-      ]
+      [userId, os, software, publicIp, privateKeyPath, expiresAt, vmName, instanceId]
     );
 
     res.status(201).json({
