@@ -4,9 +4,9 @@ const { exec } = require("child_process");
 const pool = require("../config/db"); 
 
 router.post("/delete", async (req, res) => {
-    const { vmId } = req.body;
+    const { vm_id } = req.body;
     try {
-        const vm = await pool.query("SELECT * FROM vms WHERE id = $1", [vmId]);
+        const vm = await pool.query("SELECT * FROM vms WHERE id = $1", [vm_id]);
         if (vm.rowCount === 0) return res.status(404).json({ message: "VM non trouvée." });
 
         exec("cd terraform && terraform destroy -auto-approve", async (err) => {
@@ -15,7 +15,7 @@ router.post("/delete", async (req, res) => {
                 return res.status(500).json({ message: "Erreur lors de la suppression de la VM."});
             }
 
-            await pool.query("DELETE FROM vms WHERE id = $1", [vmId]);
+            await pool.query("DELETE FROM vms WHERE id = $1", [vm_id]);
             res.json({ message: "VM supprimée avec succès." });
         });
     } catch (err) {

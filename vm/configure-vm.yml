@@ -1,5 +1,5 @@
 ---
-- name: Configurer la VM avec les logiciels et extensions
+- name: Configurer la VM avec les logiciels et services
   hosts: all
   become: true
 
@@ -8,187 +8,132 @@
     vscode_extensions: []
     ovpn_server_config_src: ""
     ovpn_server_config_dest: "/etc/openvpn/server.conf"
-    desktop_environment: "xfce4"  # Choix de l'environnement de bureau (par ex., xfce4, gnome, etc.)
-    user_password: "{{ user_password }}"  # Mot de passe pour l'utilisateur RDP
-    user_name: "{{ user_name }}"  # Nom d'utilisateur à utiliser
-    user_email: "{{ user_email }}"  # Email utilisateur, à adapter si nécessaire
+    desktop_environment: "xfce4"
+    user_password: "{{ user_password }}"
+    user_name: "{{ user_name }}"
+    user_email: "{{ user_email }}"
 
   tasks:
     - name: Mettre à jour le système
       apt:
         update_cache: yes
         upgrade: dist
-      when: ansible_facts.os_family == "Debian"  # Assurez-vous que c'est une VM Linux basée sur Debian
-
-    - name: Installer les logiciels requis sur Linux
-      apt:
-        name: "{{ software_list }}"
-        state: present
-      when: ansible_facts.os_family == "Debian" and software_list | length > 0
-
-    - name: Installer VSCode (si non présent) sur Linux
-      shell: |
-        curl -fsSL https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64 -o vscode.deb
-        apt install ./vscode.deb -y
-      args:
-        creates: /usr/bin/code
       when: ansible_facts.os_family == "Debian"
 
-    - name: Installer les extensions VSCode sur Linux
-      shell: code --install-extension {{ item }}
-      loop: "{{ vscode_extensions }}"
-      args:
-        executable: /bin/bash
+    - block:
+        - name: Installer les logiciels requis
+          apt:
+            name: "{{ software_list }}"
+            state: present
+          when: software_list | length > 0
+
+        - name: Installer Visual Studio Code
+          shell: |
+            curl -fsSL https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64 -o vscode.deb
+            apt install ./vscode.deb -y
+          args:
+            creates: /usr/bin/code
+
+        - name: Installer les extensions VSCode
+          shell: code --install-extension {{ item }}
+          loop: "{{ vscode_extensions }}"
+          when: vscode_extensions | length > 0
+
       when: ansible_facts.os_family == "Debian"
 
-    - name: Installer OpenVPN et easy-rsa sur Linux
+    - name: Installer OpenVPN et Easy-RSA
       apt:
         name:
           - openvpn
           - easy-rsa
         state: present
-        update_cache: yes
+
+    - name: Configurer l'environnement de bureau et RDP
+      block:
+        - name: Installer les packages graphiques
+          apt:
+            name:
+              - "{{ desktop_environment }}"
+              - xrdp
+              - tightvncserver
+            state: present
+
+        - name: Configurer xrdp
+          copy:
+            content: |
+              [Session]
+              Command=startxfce4
+            dest: "/etc/xrdp/startwm.sh"
+            mode: 0755
+
+        - name: Activer et démarrer xrdp
+          systemd:
+            name: xrdp
+            enabled: yes
+            state: started
+
       when: ansible_facts.os_family == "Debian"
 
-    - name: Installer les packages nécessaires pour l'interface graphique sur Linux
-      apt:
-        name:
-          - "{{ desktop_environment }}"
-          - xrdp
-          - tightvncserver
-        state: present
+    - name: Configurer OpenVPN
+      block:
+        - name: Copier le fichier de configuration OpenVPN
+          template:
+            src: "{{ ovpn_server_config_src }}"
+            dest: "{{ ovpn_server_config_dest }}"
+            mode: 0644
+
+        - name: Générer les certificats
+          shell: |
+            cd /etc/openvpn/easy-rsa
+            ./easyrsa build-server-full server nopass
+            ./easyrsa gen-crl
+          args:
+            creates: "/etc/openvpn/easy-rsa/pki/issued/server.crt"
+
+        - name: Activer OpenVPN
+          service:
+            name: openvpn@server
+            state: started
+            enabled: yes
+
       when: ansible_facts.os_family == "Debian"
 
-    - name: Configurer xrdp pour démarrer automatiquement sur Linux
-      systemd:
-        name: xrdp
-        enabled: yes
-        state: started
-      when: ansible_facts.os_family == "Debian"
+    - name: Activer et configurer RDP sous Windows
+      block:
+        - name: Activer le service RDP
+          win_service:
+            name: "TermService"
+            start_mode: auto
+            state: started
 
-    - name: Configurer le bureau XFCE pour xrdp sur Linux
-      copy:
-        content: |
-          [Session]
-          Command=startxfce4
-        dest: "/etc/xrdp/startwm.sh"
-        mode: 0755
-      when: ansible_facts.os_family == "Debian"
+        - name: Ajouter l'utilisateur au groupe Administrateurs
+          win_user:
+            name: "{{ user_name }}"
+            password: "{{ user_password }}"
+            update_password: on_create
+            state: present
+            groups:
+              - "Administrators"
 
-    - name: Redémarrer le service xrdp sur Linux pour appliquer la configuration
-      service:
-        name: xrdp
-        state: restarted
-      when: ansible_facts.os_family == "Debian"
+        - name: Ouvrir le port RDP dans le pare-feu
+          win_firewall_rule:
+            name: "Allow RDP"
+            enable: yes
+            localport: 3389
+            protocol: TCP
+            direction: in
+            action: allow
 
-    - name: Configurer OpenVPN sur Linux (serveur)
-      template:
-        src: "{{ ovpn_server_config_src }}"
-        dest: "{{ ovpn_server_config_dest }}"
-        mode: 0644
-      when: ansible_facts.os_family == "Debian"
+        - name: Configurer la clé de registre pour RDP
+          win_regedit:
+            path: "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server"
+            name: "fDenyTSConnections"
+            data: 0
+            type: dword
 
-    - name: Créer des certificats pour OpenVPN sur Linux
-      shell: |
-        cd /etc/openvpn/easy-rsa
-        ./easyrsa build-server-full server nopass
-        ./easyrsa gen-crl
-      args:
-        creates: "/etc/openvpn/easy-rsa/pki/issued/server.crt"
-      when: ansible_facts.os_family == "Debian"
+        - name: Redémarrer le service RDP
+          win_service:
+            name: "TermService"
+            state: restarted
 
-    - name: Démarrer et activer OpenVPN sur Linux
-      service:
-        name: openvpn@server
-        state: started
-        enabled: yes
-      when: ansible_facts.os_family == "Debian"
-
-    - name: Générer le fichier de configuration VPN pour le client sur Linux
-      copy:
-        content: |
-          client
-          dev tun
-          proto udp
-          remote {{ ansible_host }} 1194
-          resolv-retry infinite
-          nobind
-          persist-key
-          persist-tun
-          ca ca.crt
-          cert client.crt
-          key client.key
-          tls-auth ta.key 1
-          cipher AES-256-CBC
-          auth SHA256
-          compress lz4-v2
-          verb 3
-        dest: "/home/{{ ansible_user }}/{{ user_email }}.ovpn"
-        mode: 0644
-      when: ansible_facts.os_family == "Debian"
-
-    - name: Copier les certificats nécessaires au fichier .ovpn sur Linux
-      copy:
-        src: "/etc/openvpn/easy-rsa/pki/{{ item }}"
-        dest: "/home/{{ ansible_user }}/{{ user_email }}.ovpn"
-        mode: 0644
-      with_items:
-        - "issued/client.crt"
-        - "private/client.key"
-        - "ta.key"
-        - "ca.crt"
-      when: ansible_facts.os_family == "Debian"
-
-    # Configuration Windows (RDP) #
-    - name: Activer RDP sur Windows
-      win_service:
-        name: "TermService"
-        start_mode: auto
-        state: started
-      when: ansible_facts.system == "Windows"
-
-    - name: Ouvrir le port 3389 pour RDP dans le pare-feu Windows
-      win_firewall_rule:
-        name: "Allow RDP"
-        enable: yes
-        localport: 3389
-        remoteport: any
-        protocol: TCP
-        direction: in
-        action: allow
-      when: ansible_facts.system == "Windows"
-
-    - name: Activer l'accès à distance pour l'utilisateur Windows
-      win_user:
-        name: "{{ user_name }}"
-        password: "{{ user_password }}"
-        update_password: on_create
-        state: present
-        groups:
-          - "Administrators"
-      when: ansible_facts.system == "Windows"
-
-    - name: Configurer les paramètres RDP pour autoriser les connexions Windows
-      win_regedit:
-        path: "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server"
-        name: "fDenyTSConnections"
-        data: "0"
-        type: dword
-        state: present
-      when: ansible_facts.system == "Windows"
-
-    - name: Redémarrer le service RDP sur Windows
-      win_service:
-        name: "TermService"
-        state: restarted
-      when: ansible_facts.system == "Windows"
-
-    - name: Vérifier que RDP est activé sur Windows
-      win_command: "query session"
-      register: query_session
-      when: ansible_facts.system == "Windows"
-
-    - name: Afficher la sortie de la commande de vérification RDP sur Windows
-      debug:
-        msg: "{{ query_session.stdout }}"
       when: ansible_facts.system == "Windows"

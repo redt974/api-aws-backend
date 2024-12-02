@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
 
-function createTerraformConfig(ami, vmName, outputPath) {
+function createTerraformConfig(ami, vm_name, outputPath) {
   const config = `
 provider "aws" {
   region = "${process.env.AWS_REGION}"
@@ -14,7 +14,7 @@ resource "tls_private_key" "vm_key" {
 }
 
 resource "aws_key_pair" "key" {
-  key_name   = "${vmName}-key"
+  key_name   = "${vm_name}-key"
   public_key = tls_private_key.vm_key.public_key_openssh
 }
 
@@ -23,7 +23,7 @@ resource "aws_instance" "vm" {
   instance_type = "${process.env.INSTANCE_TYPE}"
   key_name      = aws_key_pair.key.key_name
   tags = {
-    Name = "${vmName}"
+    Name = "${vm_name}"
   }
 }
 
@@ -53,16 +53,16 @@ async function runTerraform(directory) {
           return reject(err);
         }
 
-        console.log("Terraform stdout:", stdout); // Log des sorties pour débogage
+        // console.log("Terraform stdout:", stdout); // Log des sorties pour débogage
 
         // Extraction des outputs non sensibles
         const ipMatch = stdout.match(/public_ip\s*=\s*"([^"]+)"/);
         const instanceIdMatch = stdout.match(/instance_id\s*=\s*"([^"]+)"/);
 
-        const publicIp = ipMatch ? ipMatch[1] : null;
-        const instanceId = instanceIdMatch ? instanceIdMatch[1] : null;
+        const public_ip = ipMatch ? ipMatch[1] : null;
+        const instance_id = instanceIdMatch ? instanceIdMatch[1] : null;
 
-        if (!publicIp || !instanceId) {
+        if (!public_ip || !instance_id) {
           console.error("Erreur : Les sorties Terraform sont incomplètes.");
           return reject(new Error("Erreur dans les sorties Terraform"));
         }
@@ -80,9 +80,9 @@ async function runTerraform(directory) {
 
             try {
               const outputs = JSON.parse(outputStdout);
-              const privateKey = outputs.private_key_pem?.value || null;
+              const private_key = outputs.private_key_pem?.value || null;
 
-              if (!privateKey) {
+              if (!private_key) {
                 console.error(
                   "Erreur : La clé privée est introuvable dans les outputs Terraform."
                 );
@@ -93,7 +93,7 @@ async function runTerraform(directory) {
                 );
               }
 
-              resolve({ publicIp, instanceId, privateKey });
+              resolve({ public_ip, instance_id, private_key });
             } catch (parseError) {
               console.error(
                 "Erreur lors du parsing des outputs Terraform :",
