@@ -12,6 +12,7 @@
     user_password: "{{ user_password }}"
     user_name: "{{ user_name }}"
     user_email: "{{ user_email }}"
+    instance_id: "{{ instance_id }}"
 
   tasks:
     - name: Mettre à jour le système

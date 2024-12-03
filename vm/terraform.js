@@ -1,5 +1,4 @@
 const fs = require("fs");
-const path = require("path");
 const { exec } = require("child_process");
 
 function createTerraformConfig(ami, vm_name, outputPath) {
@@ -53,52 +52,33 @@ async function runTerraform(directory) {
           return reject(err);
         }
 
-        // console.log("Terraform stdout:", stdout); // Log des sorties pour débogage
-
-        // Extraction des outputs non sensibles
-        const ipMatch = stdout.match(/public_ip\s*=\s*"([^"]+)"/);
-        const instanceIdMatch = stdout.match(/instance_id\s*=\s*"([^"]+)"/);
-
-        const public_ip = ipMatch ? ipMatch[1] : null;
-        const instance_id = instanceIdMatch ? instanceIdMatch[1] : null;
-
-        if (!public_ip || !instance_id) {
-          console.error("Erreur : Les sorties Terraform sont incomplètes.");
-          return reject(new Error("Erreur dans les sorties Terraform"));
-        }
-
-        // Exécuter terraform output pour récupérer les valeurs sensibles
+        // Utilisation de terraform output -json pour récupérer les données de manière fiable
         exec(
           `cd ${directory} && terraform output -json`,
           (outputErr, outputStdout, outputStderr) => {
             if (outputErr) {
-              console.error(
-                `Erreur lors de la récupération des outputs : ${outputStderr}`
-              );
+              console.error(`Erreur lors de la récupération des outputs : ${outputStderr}`);
               return reject(outputErr);
             }
 
+            console.log("Terraform output -json:", outputStdout); // Log de la sortie JSON
+
             try {
               const outputs = JSON.parse(outputStdout);
+
+              // Extraction des valeurs non sensibles
+              const public_ip = outputs.public_ip?.value || null;
+              const instance_id = outputs.instance_id?.value || null;
               const private_key = outputs.private_key_pem?.value || null;
 
-              if (!private_key) {
-                console.error(
-                  "Erreur : La clé privée est introuvable dans les outputs Terraform."
-                );
-                return reject(
-                  new Error(
-                    "Erreur dans les sorties Terraform (private_key_pem manquant)"
-                  )
-                );
+              if (!public_ip || !instance_id || !private_key) {
+                console.error("Erreur : Les sorties Terraform sont incomplètes.");
+                return reject(new Error("Erreur dans les sorties Terraform"));
               }
 
               resolve({ public_ip, instance_id, private_key });
             } catch (parseError) {
-              console.error(
-                "Erreur lors du parsing des outputs Terraform :",
-                parseError.message
-              );
+              console.error("Erreur lors du parsing des outputs Terraform :", parseError.message);
               reject(parseError);
             }
           }

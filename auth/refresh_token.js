@@ -22,14 +22,14 @@ router.post('/', (req, res) => {
 
     // Générer un nouveau token d'accès
     const newToken = jwt.sign(
-      { userId: decoded.userId },
+      { id: decoded.id },
       secretKey,
       { expiresIn: '30m' } // Token d'accès valide pendant 30 minutes
     );
 
     // Générer un nouveau refresh token
     const newRefreshToken = jwt.sign(
-      { userId: decoded.userId },
+      { id: decoded.id },
       refreshSecretKey,
       { expiresIn: '7d' } // Refresh token valide pendant 7 jours
     );

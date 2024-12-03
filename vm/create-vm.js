@@ -77,7 +77,8 @@ router.post("/create", async (req, res) => {
       ovpnConfigServeur,
       user_email,
       user_name,
-      user_password
+      user_password,
+      instance_id 
     );
 
     // Création du fichier de configuration OpenVPN client
