@@ -1,0 +1,134 @@
+---
+- name: Configurer Windows Server avec VSCode et les outils nécessaires
+  hosts: windows
+  become: yes
+  vars_files:
+    - common.yml
+
+  tasks:
+      ### Installer OpenSSH Server ###
+    - name: Vérifier si OpenSSH Server est installé
+      win_feature:
+        name: OpenSSH-Server
+        state: present
+      register: openssh_installed
+
+    - name: S'assurer que le service OpenSSH est en cours d'exécution
+      win_service:
+        name: sshd
+        start_mode: auto
+        state: started
+      when: openssh_installed.changed
+
+    - name: Ouvrir le port SSH dans le pare-feu
+      win_firewall_rule:
+        name: Allow SSH
+        enable: yes
+        localport: 22
+        protocol: TCP
+        direction: in
+        action: allow
+
+    - name: Vérifier si OpenSSH est déjà en cours d'exécution
+      win_service:
+        name: sshd
+        state: started
+        start_mode: auto
+
+    ### Vérifier l'état du service OpenSSH ###
+    - name: Vérifier si OpenSSH est installé et en cours d'exécution
+      win_command: powershell.exe Get-Service -Name sshd
+      register: sshd_status
+      failed_when: false
+      changed_when: false
+
+    - name: Afficher l'état de SSH
+      debug:
+        var: sshd_status.stdout
+
+    ### Vérifier si Chocolatey est installé ###
+      - name: Vérifier si Chocolatey est installé
+      win_command: choco --version
+      register: choco_installed
+      failed_when: false
+      changed_when: false
+      ignore_errors: yes
+
+    ### Installer Chocolatey ###
+    - name: Installer Chocolatey
+      win_shell: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force;
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+      args:
+        executable: powershell.exe
+      register: choco_install
+      changed_when: "'Chocolatey v' in choco_install.stdout"
+
+    ### Installer les logiciels requis via Chocolatey ###
+    - name: Installer les logiciels via Chocolatey
+      win_chocolatey:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ software_list }}"
+      when: ansible_facts['platform'] == "Windows" and software_list | length > 0
+
+    ### Installer Git sur Windows ###
+    - name: Installer Git sur Windows
+      win_chocolatey:
+        name: git
+        state: present
+      when: ansible_facts['platform'] == "Windows"
+
+    ### Vérifier si VSCode est déjà installé ###
+    - name: Vérifier si VSCode est déjà installé
+      win_command: "code --version"
+      register: vscode_installed
+      failed_when: false
+      changed_when: false
+      ignore_errors: yes
+
+    ### Installer Visual Studio Code ###
+    - name: Installer Visual Studio Code
+      win_chocolatey:
+        name: vscode
+        state: present
+      when: vscode_installed.rc != 0
+
+    ### Installer les extensions Visual Studio Code ###
+    - name: Installer les extensions VSCode
+      win_shell: code --install-extension {{ item }}
+      loop: "{{ vscode_extensions }}"
+      args:
+        executable: cmd.exe
+      when: vscode_installed.rc == 0 and vscode_extensions | length > 0
+      ignore_errors: yes
+
+    ### Configurer RDP sur Windows Server ###
+    - block:
+        - name: Activer le service RDP
+          win_service:
+            name: TermService
+            start_mode: auto
+            state: started
+
+        - name: Ouvrir le port RDP dans le pare-feu
+          win_firewall_rule:
+            name: Allow RDP
+            enable: yes
+            localport: 3389
+            protocol: TCP
+            direction: in
+            action: allow
+
+        - name: Configurer la clé de registre pour RDP
+          win_regedit:
+            path: HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server
+            name: fDenyTSConnections
+            data: 0
+            type: dword
+
+        - name: Redémarrer le service RDP
+          win_service:
+            name: TermService
+            state: restarted

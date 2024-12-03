@@ -7,7 +7,6 @@ const { getUserEmail } = require("../auth/user");
 const { createTerraformConfig, runTerraform } = require("./terraform");
 const { generateAnsibleInventory, runAnsiblePlaybook } = require("./ansible");
 const pool = require("../config/db");
-const { generateVPNConfig } = require("./vpn");
 
 router.post("/create", async (req, res) => {
   let { os, software, extensions, user_name, user_password } = req.body;
@@ -67,27 +66,30 @@ router.post("/create", async (req, res) => {
     const inventoryPath = path.join(userDir, "inventory");
     await generateAnsibleInventory({ public_ip: public_ip, os: os, ssh_private_key: privateKeyPath }, inventoryPath);
     
-    const ovpnConfigServeur = path.join(__dirname, 'openvpn-server.conf');
+    // Choisir le playbook à exécuter en fonction du système d'exploitation
+    let playbook = '';
+    if (os === 'Windows 10' || os === 'Windows 11') {
+      playbook = 'configure_windows.yml';  
+    } else {
+      playbook = 'configure_linux.yml'; 
+    }
 
     // Exécution du playbook Ansible
     await runAnsiblePlaybook(
       inventoryPath,
+      playbook, 
       software,
       extensions,
-      ovpnConfigServeur,
       user_email,
       user_name,
       user_password,
       instance_id 
     );
 
-    // Création du fichier de configuration OpenVPN client
-    const vpnConfigClient = await generateVPNConfig(public_ip, user_email, instance_id, userDir);
-
     // Insertion dans la base de données
     const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000); // Expiration dans 12 heures
-    const result = await pool.query("INSERT INTO vms (user_id, os, software, public_ip, private_key, expires_at, name, instance_id, vpn_config) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id", 
-      [user_id, os, software, public_ip, privateKeyPath, expiresAt, vm_name, instance_id, vpnConfigClient]);
+    const result = await pool.query("INSERT INTO vms (user_id, os, software, public_ip, private_key, expires_at, name, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id", 
+      [user_id, os, software, public_ip, privateKeyPath, expiresAt, vm_name, instance_id]);
 
     res.status(201).json({
       vm_id: result.rows[0].id,

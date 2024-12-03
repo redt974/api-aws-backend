@@ -1,0 +1,170 @@
+---
+- name: Configurer la VM avec les logiciels et services sous Linux
+  hosts: all
+  become: true
+  vars_files:
+    - common.yml
+
+  tasks:
+    ### Mise à jour du système ###
+    - name: Mettre à jour le système
+      package:
+        name: "*"
+        state: latest
+      when: ansible_facts.os_family in ["Debian", "RedHat"]
+
+    ### Vérifier si Git est installé ###
+    - name: Vérifier si Git est installé
+      command: git --version
+      register: git_installed
+      failed_when: false
+      changed_when: false
+      ignore_errors: yes
+
+    ### Installer Git sur Linux ###
+    - name: Installer Git sur Linux
+      apt:
+        name: git
+        state: present
+      when: git_installed.rc != 0
+      when: ansible_facts.os_family == "Debian"
+
+    ### Vérifier si VSCode est installé ###
+    - name: Vérifier si VSCode est installé
+      command: code --version
+      register: vscode_installed
+      failed_when: false
+      changed_when: false
+      ignore_errors: yes
+
+    ### Installation et configuration de Visual Studio Code ###
+    - block:
+        - name: Télécharger Visual Studio Code (Debian/Ubuntu)
+          get_url:
+            url: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
+            dest: /tmp/vscode.deb
+          when: ansible_facts.os_family == "Debian"
+
+        - name: Installer Visual Studio Code (Debian/Ubuntu)
+          apt:
+            deb: /tmp/vscode.deb
+          when: ansible_facts.os_family == "Debian"
+
+        - name: Vérifier si VSCode est installé
+          command: which code
+          register: vscode_installed
+          failed_when: vscode_installed.rc != 0
+          ignore_errors: yes
+
+        - name: Installer les extensions VSCode
+          shell: code --install-extension {{ item }}
+          loop: "{{ vscode_extensions }}"
+          when: vscode_extensions | length > 0
+          ignore_errors: yes
+      when: vscode_extensions | length > 0
+
+    ### Installation des logiciels requis ###
+    - name: Installer les logiciels requis
+      package:
+        name: "{{ software_list }}"
+        state: present
+      when: software_list | length > 0
+
+    ### Installation et configuration de VNC et XFCE ###
+    - name: Installer VNC et XFCE4
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - tightvncserver
+        - xfce4
+      when: ansible_facts.os_family == "Debian"
+
+    - name: Configurer VNC pour démarrer avec XFCE
+      copy:
+        content: |
+          #!/bin/sh
+          startxfce4
+        dest: /home/{{ ansible_user }}/.vnc/xstartup
+        mode: '0755'
+      when: ansible_facts.os_family == "Debian"
+
+    - name: Démarrer le serveur VNC
+      shell: |
+        tightvncserver :1 -geometry 1280x1024 -depth 24
+      become: yes
+      environment:
+        DISPLAY: ":1"
+      when: ansible_facts.os_family == "Debian"
+
+    ### Configuration de l'environnement graphique (XFCE + RDP) ###
+    - block:
+        - name: Installer les packages graphiques
+          package:
+            name:
+              - "{{ desktop_environment }}"
+              - xrdp
+              - tightvncserver
+            state: present
+
+        - name: Configurer xrdp pour XFCE
+          copy:
+            content: |
+              #!/bin/sh
+              startxfce4
+            dest: /etc/xrdp/startwm.sh
+            mode: 0755
+
+        - name: Activer et démarrer xrdp
+          systemd:
+            name: xrdp
+            enabled: yes
+            state: started
+      when: ansible_facts.os_family == "Debian"
+
+    ### Installation et configuration de VNC Server ###
+    - block:
+        - name: Configurer VNC pour démarrer avec XFCE
+          copy:
+            dest: /etc/systemd/system/vncserver@.service
+            content: |
+              [Unit]
+              Description=Start TightVNC server at startup
+              After=syslog.target network.target
+
+              [Service]
+              Type=forking
+              User={{ user_name }}
+              PAMName=login
+              PIDFile=/home/{{ user_name }}/.vnc/%H:%i.pid
+              ExecStartPre=-/usr/bin/vncserver -kill :%i > /dev/null 2>&1
+              ExecStart=/usr/bin/vncserver :%i -geometry 1920x1080 -depth 24
+              ExecStop=/usr/bin/vncserver -kill :%i
+
+              [Install]
+              WantedBy=multi-user.target
+
+        - name: Démarrer VNC Server au démarrage
+          systemd:
+            daemon_reload: yes
+            name: vncserver@1.service
+            enabled: yes
+            state: started
+
+        - name: Créer un mot de passe pour VNC
+          shell: |
+            echo '{{ user_password }}' | vncpasswd -f > /home/{{ user_name }}/.vnc/passwd
+          args:
+            creates: /home/{{ user_name }}/.vnc/passwd
+          become: yes
+          become_user: "{{ user_name }}"
+          no_log: true
+
+        - name: Ajuster les permissions du fichier VNC
+          file:
+            path: /home/{{ user_name }}/.vnc/passwd
+            owner: "{{ user_name }}"
+            group: "{{ user_name }}"
+            mode: '0600'
+      when: ansible_facts.os_family == "Debian"

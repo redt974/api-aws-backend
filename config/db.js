@@ -26,7 +26,7 @@ const pool = new Pool({
         created_at TIMESTAMP DEFAULT NOW()   -- Date de création de l'utilisateur
       )
     `);
-    console.log("Table Utilisateurs initialisée.");
+    console.log("Table Utilisateurs");
 
     // Création de la table `vms`
     await pool.query(`
@@ -37,7 +37,6 @@ const pool = new Pool({
         software TEXT,                        -- Logiciels installés
         public_ip VARCHAR(50),                -- Adresse IP publique
         private_key TEXT,                     -- Clé privée pour l'accès SSH
-        vpn_config TEXT,                      -- Chemin vers le fichier de configuration VPN
         name VARCHAR(255) NOT NULL,           -- Nom unique de la VM
         instance_id VARCHAR(50),              -- ID de l'instance dans AWS
         created_at TIMESTAMP DEFAULT NOW(),   -- Date de création
@@ -45,7 +44,7 @@ const pool = new Pool({
         FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE -- Clé étrangère vers utilisateurs
       )
     `);
-    console.log("Table VMs initialisée.");
+    console.log("Table VMs");
 
     // Création de la table `reset_tokens`
     await pool.query(`
@@ -57,7 +56,7 @@ const pool = new Pool({
         FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE CASCADE
       )
     `);
-    console.log("Table Reset_Tokens initialisée.");
+    console.log("Table Reset_Tokens");
   } catch (err) {
     console.error("Erreur lors de l'initialisation des tables :", err.message);
   }

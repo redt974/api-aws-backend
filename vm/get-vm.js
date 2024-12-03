@@ -14,7 +14,7 @@ router.get("/get-vm", async (req, res) => {
     try {
         // Requête pour récupérer les VMs de l'utilisateur
         const result = await pool.query(
-            `SELECT id, os, software, public_ip, private_key, vpn_config, name, instance_id, created_at, expires_at 
+            `SELECT id, os, software, public_ip, private_key, name, instance_id, created_at, expires_at 
             FROM vms WHERE user_id = $1`, 
             [user_id]
         );
