@@ -11,13 +11,4 @@ async function getUserEmail(userId) {
   }
 }
 
-function getUserIdFromToken(token) {
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    return decoded.id;
-  } catch (err) {
-    return null;
-  }
-}
-
-module.exports = { getUserEmail, getUserIdFromToken };
+module.exports = { getUserEmail };

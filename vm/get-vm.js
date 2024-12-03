@@ -1,19 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
-const { getUserIdFromToken, getUserEmail } = require("../auth/user");
+const { getUserEmail } = require("../auth/user");
 
 router.get("/get-vm", async (req, res) => {
-    // Vérification du token d'accès
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(400).json({ message: "Token d'accès manquant." });
-
-    const user_id = getUserIdFromToken(token);
-    if (!user_id) return res.status(401).json({ message: "Token invalide ou expiré." });
-
+    const user_id = req.user.id;  // Récupère l'ID utilisateur injecté par le middleware
+  
     const user_email = await getUserEmail(user_id);
-    if (!user_email) return res.status(404).json({ message: "Utilisateur non trouvé." });
-
+    if (!user_email) {
+      return res.status(404).json({ message: "Utilisateur non trouvé." });
+    }
+    
     try {
         // Requête pour récupérer les VMs de l'utilisateur
         const result = await pool.query(

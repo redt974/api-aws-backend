@@ -3,7 +3,7 @@ const router = express.Router();
 const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
-const { getUserEmail, getUserIdFromToken } = require("../auth/user");
+const { getUserEmail } = require("../auth/user");
 const { createTerraformConfig, runTerraform } = require("./terraform");
 const { generateAnsibleInventory, runAnsiblePlaybook } = require("./ansible");
 const pool = require("../config/db");
@@ -16,15 +16,12 @@ router.post("/create", async (req, res) => {
   software = Array.isArray(software) ? software : [software];
   extensions = Array.isArray(extensions) ? extensions : [extensions];
   
-  // Vérification du token d'accès
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(400).json({ message: "Token d'accès manquant."});
-
-  const user_id = getUserIdFromToken(token);
-  if (!user_id) return res.status(401).json({ message: "Token invalide ou expiré."});
+  const user_id = req.user.id;  // Récupère l'ID utilisateur injecté par le middleware
 
   const user_email = await getUserEmail(user_id);
-  if (!user_email) return res.status(404).json({ message: "Utilisateur non trouvé."});
+  if (!user_email) {
+    return res.status(404).json({ message: "Utilisateur non trouvé." });
+  }
 
   // Vérification de l'OS
   const ami = {
