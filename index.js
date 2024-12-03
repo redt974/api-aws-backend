@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { exec } = require("child_process");
@@ -15,6 +16,7 @@ const port = process.env.PORT || 3000;
 
 // Middlewares globaux
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 const corsOptions = {
     origin: 'http://localhost:3000',  // FRONTEND
