@@ -33,6 +33,16 @@ router.post("/create", async (req, res) => {
 
   if (!ami) return res.status(400).json({ message: "OS non pris en charge."});
 
+  const userMapping = {
+    Ubuntu: 'ubuntu',
+    Debian: 'debian',
+    Kali: 'kali',
+    "Windows 10": 'Administrator',
+    "Windows 11": 'Administrator',
+  };
+
+  const ansibleUser = userMapping[os];
+
   try {
     // Vérification des VMs actives de l'utilisateur
     const existingVM = await pool.query("SELECT COUNT(*) FROM vms WHERE user_id = $1 AND expires_at > NOW()", [user_id]);
@@ -64,14 +74,14 @@ router.post("/create", async (req, res) => {
 
     // Création de l'inventaire Ansible
     const inventoryPath = path.join(userDir, "inventory");
-    await generateAnsibleInventory({ public_ip: public_ip, os: os, ssh_private_key: privateKeyPath }, inventoryPath);
+    await generateAnsibleInventory({ public_ip: public_ip, ansibleUser: ansibleUser, ssh_private_key: privateKeyPath }, inventoryPath);
     
     // Choisir le playbook à exécuter en fonction du système d'exploitation
     let playbook = '';
     if (os === 'Windows 10' || os === 'Windows 11') {
-      playbook = 'configure_windows.yml';  
+      playbook = '../playbooks/vm_windows.yml';  
     } else {
-      playbook = 'configure_linux.yml'; 
+      playbook = '../playbooks/vm_linux.yml'; 
     }
 
     // Exécution du playbook Ansible
@@ -83,7 +93,10 @@ router.post("/create", async (req, res) => {
       user_email,
       user_name,
       user_password,
-      instance_id 
+      instance_id,
+      privateKeyPath,
+      ansibleUser, 
+      public_ip
     );
 
     // Insertion dans la base de données
@@ -102,7 +115,7 @@ router.post("/create", async (req, res) => {
     });
   } catch (err) {
     console.error("Erreur lors de la création de la VM :", err.message);
-    res.status(500).json({ message: "Erreur interne du serveur."});
+    res.status(500).json({ message: "Erreur interne du serveur." });
   }
 });
 

@@ -20,7 +20,7 @@ router.get("/get-vm", async (req, res) => {
         );
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ message: "Aucune VM trouvée pour cet utilisateur." });
+            return res.status(201).json({ message: "Aucune VM trouvée pour cet utilisateur." });
         }
 
         // Formatage des données pour chaque VM

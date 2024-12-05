@@ -18,9 +18,11 @@ resource "aws_key_pair" "key" {
 }
 
 resource "aws_instance" "vm" {
-  ami           = "${ami}"
-  instance_type = "${process.env.INSTANCE_TYPE}"
-  key_name      = aws_key_pair.key.key_name
+  ami               = "${ami}"
+  instance_type     = "${process.env.INSTANCE_TYPE}"
+  key_name          = aws_key_pair.key.key_name
+  vpc_security_group_ids = [aws_security_group.vm_sg.id]  # Association du Security Group
+  
   tags = {
     Name = "${vm_name}"
   }
@@ -50,25 +52,11 @@ resource "aws_security_group" "vm_sg" {
     cidr_blocks = ["0.0.0.0/0"]  
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   ingress {
     from_port   = 5900
     to_port     = 5900
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]  
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {

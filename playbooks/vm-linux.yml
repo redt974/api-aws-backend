@@ -38,30 +38,34 @@
       ignore_errors: yes
 
     ### Installation et configuration de Visual Studio Code ###
-    - block:
-        - name: Télécharger Visual Studio Code (Debian/Ubuntu)
-          get_url:
-            url: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
-            dest: /tmp/vscode.deb
-          when: ansible_facts.os_family == "Debian"
+    - name: Télécharger Visual Studio Code (Debian/Ubuntu)
+      get_url:
+        url: https://go.microsoft.com/fwlink/?LinkID=760868
+        dest: /tmp/vscode.deb
+      when: ansible_facts.os_family == "Debian"
+      register: download_result
 
-        - name: Installer Visual Studio Code (Debian/Ubuntu)
-          apt:
-            deb: /tmp/vscode.deb
-          when: ansible_facts.os_family == "Debian"
+    - name: Vérifier que le fichier VSCode a été téléchargé
+      fail:
+        msg: "Échec du téléchargement de Visual Studio Code"
+      when: download_result.failed
 
-        - name: Vérifier si VSCode est installé
-          command: which code
-          register: vscode_installed
-          failed_when: vscode_installed.rc != 0
-          ignore_errors: yes
+    - name: Installer Visual Studio Code (Debian/Ubuntu)
+      dpkg:
+        name: /tmp/vscode.deb
+      when: ansible_facts.os_family == "Debian"
 
-        - name: Installer les extensions VSCode
-          shell: code --install-extension {{ item }}
-          loop: "{{ vscode_extensions }}"
-          when: vscode_extensions | length > 0
-          ignore_errors: yes
-      when: vscode_extensions | length > 0
+    - name: Réparer les dépendances de Visual Studio Code
+      apt:
+        update_cache: yes
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - libx11-dev
+        - libxkbfile-dev
+        - libsecret-1-0
+      when: ansible_facts.os_family == "Debian"
+
 
     ### Installation des logiciels requis ###
     - name: Installer les logiciels requis

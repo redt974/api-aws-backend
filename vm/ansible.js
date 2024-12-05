@@ -1,21 +1,23 @@
 const { exec } = require('child_process');
-const fs = require('fs').promises; 
+const fs = require('fs').promises;
 
+// Fonction pour exécuter une commande en utilisant des promesses
+const execPromise = (command) => {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(`Erreur lors de l'exécution de la commande : ${stderr || error.message}`));
+      } else {
+        resolve({ stdout, stderr });
+      }
+    });
+  });
+};
+
+// Fonction pour générer l'inventaire Ansible
 const generateAnsibleInventory = (vm, filePath) => {
-  // Choisir le nom d'utilisateur en fonction du système d'exploitation
-  const userMapping = {
-    Ubuntu: 'ubuntu',
-    Debian: 'debian',
-    Kali: 'kali',
-    "Windows 10": 'Administrator',
-    "Windows 11": 'Administrator',
-  };
+  const inventoryContent = `[all]\n${vm.public_ip} ansible_user=${vm.ansibleUser} ansible_ssh_private_key_file="${vm.ssh_private_key}"`;
 
-  const ansibleUser = userMapping[vm.os] || 'ubuntu'; // Utilise 'ubuntu' par défaut si l'OS n'est pas trouvé
-
-  const inventoryContent = `[all]\npublic_ip=${vm.public_ip} ansible_user=${ansibleUser} ansible_ssh_private_key_file="${vm.ssh_private_key}"`;
-
-  // Utilisation de fs.promises.writeFile pour retourner une promesse
   return fs.writeFile(filePath, inventoryContent.trim())
     .then(() => console.log('Fichier d\'inventaire créé avec succès !'))
     .catch((err) => {
@@ -23,9 +25,10 @@ const generateAnsibleInventory = (vm, filePath) => {
     });
 };
 
-const runAnsiblePlaybook = (inventoryPath, playbook, software, extensions, userEmail, userName, userPassword, instance_id) => {
-  return new Promise((resolve, reject) => {
-    // Utilisation de JSON.stringify pour échapper correctement les variables
+// Fonction pour exécuter le playbook Ansible
+const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions, userEmail, userName, userPassword, instance_id, privateKeyPath, ansibleUser, public_ip) => {
+  try {
+    // Préparation des variables supplémentaires pour Ansible
     const extraVars = JSON.stringify({
       software_list: software,
       vscode_extensions: extensions,
@@ -33,26 +36,33 @@ const runAnsiblePlaybook = (inventoryPath, playbook, software, extensions, userE
       user_name: userName,
       user_password: userPassword,
       instance_id: instance_id
-    });
+    }).replace(/"/g, '\\"'); // Échappement des guillemets
 
     const ansibleCommand = `
-    ansible-playbook ${playbook} \
-    -i ${inventoryPath} \
-    --extra-vars '${extraVars.replace(/"/g, '\\"')}'  # Remplacer les guillemets simples par des doubles
-  `;
+      ansible-playbook "${playbook}" \
+      -i "${inventoryPath}" \
+      --private-key "${privateKeyPath}" \
+      --extra-vars "${extraVars}" \
+      -vvv
+    `;
 
-    exec(ansibleCommand, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Erreur lors de l'exécution du playbook : ${stderr}`);
-        return reject(new Error(`Erreur Ansible : ${stderr.trim()}\nSortie complète : ${stdout}`));
-      }
-      console.log(`Ansible stdout : ${stdout}`);
-      resolve(stdout);
-    });
-  });
+    // Exécution du playbook Ansible
+    const { stdout, stderr } = await execPromise(ansibleCommand);
+
+    if (stderr) {
+      throw new Error(`Erreur lors de l'exécution du playbook Ansible : ${stderr}`);
+    }
+
+    console.log(`Sortie Ansible : ${stdout}`);
+    return stdout;
+  } catch (err) {
+    console.error(`Erreur Ansible : ${err.message}`);
+    throw new Error(`Erreur Ansible : ${err.message}`);
+  }
 };
 
 module.exports = {
   runAnsiblePlaybook,
-  generateAnsibleInventory
+  generateAnsibleInventory,
+  execPromise
 };
