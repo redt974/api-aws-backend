@@ -43,7 +43,7 @@ const getVmRoute = require("./vm/get-vm");
 const createVmRoute = require("./vm/create-vm");
 const windowspasswordRoute = require("./vm/windows-password");
 const downloadSSHRoute = require("./vm/download-ssh");
-const downloadVPNRoute = require("./vm/download-vpn");
+// const downloadVPNRoute = require("./vm/download-vpn");
 const deleteVmRoute = require("./vm/delete-vm");
 
 // Routes pour l'authentification
@@ -62,7 +62,7 @@ app.use("/api/vm", authMiddleware, getVmRoute);
 app.use("/api/vm", authMiddleware, createVmRoute);
 app.use("/api/vm", authMiddleware, windowspasswordRoute);
 app.use("/api/vm", authMiddleware, downloadSSHRoute);
-app.use("/api/vm", authMiddleware, downloadVPNRoute);
+// app.use("/api/vm", authMiddleware, downloadVPNRoute);
 app.use("/api/vm", authMiddleware, deleteVmRoute);
 
 // Supprimer une VM automatiquement après expiration

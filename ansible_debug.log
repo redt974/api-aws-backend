@@ -1,0 +1,402 @@
+ansible-playbook [core 2.14.16]
+  config file = None
+  configured module search path = ['/home/serveur/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python3/dist-packages/ansible
+  ansible collection location = /home/serveur/.ansible/collections:/usr/share/ansible/collections
+  executable location = /usr/bin/ansible-playbook
+  python version = 3.11.2 (main, Sep 14 2024, 03:00:30) [GCC 12.2.0] (/usr/bin/python3)
+  jinja version = 3.1.2
+  libyaml = True
+No config file found; using defaults
+host_list declined parsing /home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/inventory as it did not pass its verify_file() method
+script declined parsing /home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/inventory as it did not pass its verify_file() method
+auto declined parsing /home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/inventory as it did not pass its verify_file() method
+Parsed /home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/inventory inventory source with ini plugin
+Skipping callback 'default', as we already have a stdout callback.
+Skipping callback 'minimal', as we already have a stdout callback.
+Skipping callback 'oneline', as we already have a stdout callback.
+
+PLAYBOOK: vm-linux.yml *********************************************************
+1 plays in /home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml
+Read vars_file 'common.yml'
+Read vars_file 'common.yml'
+Read vars_file 'common.yml'
+
+PLAY [Configurer la VM avec les logiciels et services sous Linux] **************
+Read vars_file 'common.yml'
+
+TASK [Gathering Facts] *********************************************************
+task path: /home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml:2
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'echo ~ubuntu && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'/home/ubuntu\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ubuntu/.ansible/tmp `"&& mkdir "` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737 `" && echo ansible-tmp-1733497132.7755687-7397-47112676450737="` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737 `" ) && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'ansible-tmp-1733497132.7755687-7397-47112676450737=/home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> Attempting python interpreter discovery
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'echo PLATFORM; uname; echo FOUND; command -v '"'"'"'"'"'"'"'"'python3.11'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'python3.10'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'python3.9'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'python3.8'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'python3.7'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'python3.6'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'python3.5'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'/usr/bin/python3'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'/usr/libexec/platform-python'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'python2.7'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'/usr/bin/python'"'"'"'"'"'"'"'"'; command -v '"'"'"'"'"'"'"'"'python'"'"'"'"'"'"'"'"'; echo ENDFOUND && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'PLATFORM\nLinux\nFOUND\n/usr/bin/python3\nENDFOUND\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'/usr/bin/python3 && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'{"platform_dist_result": [], "osrelease_content": "PRETTY_NAME=\\"Ubuntu 24.04.1 LTS\\"\\nNAME=\\"Ubuntu\\"\\nVERSION_ID=\\"24.04\\"\\nVERSION=\\"24.04.1 LTS (Noble Numbat)\\"\\nVERSION_CODENAME=noble\\nID=ubuntu\\nID_LIKE=debian\\nHOME_URL=\\"https://www.ubuntu.com/\\"\\nSUPPORT_URL=\\"https://help.ubuntu.com/\\"\\nBUG_REPORT_URL=\\"https://bugs.launchpad.net/ubuntu/\\"\\nPRIVACY_POLICY_URL=\\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\\"\\nUBUNTU_CODENAME=noble\\nLOGO=ubuntu-logo\\n"}\n', b'')
+Using module file /usr/lib/python3/dist-packages/ansible/modules/setup.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> PUT /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmpzymzl450 TO /home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737/AnsiballZ_setup.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' '[ec2-51-44-7-75.eu-west-3.compute.amazonaws.com]'
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'sftp> put /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmpzymzl450 /home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737/AnsiballZ_setup.py\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'chmod u+x /home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737/ /home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737/AnsiballZ_setup.py && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' -tt ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'sudo -H -S -n  -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-axmtyqysjnorhoxzqgrhcdkezvemffic ; /usr/bin/python3 /home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737/AnsiballZ_setup.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+Escalation succeeded
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'\r\n{"ansible_facts": {"ansible_system": "Linux", "ansible_kernel": "6.8.0-1016-aws", "ansible_kernel_version": "#17-Ubuntu SMP Mon Sep  2 13:48:07 UTC 2024", "ansible_machine": "x86_64", "ansible_python_version": "3.12.3", "ansible_fqdn": "ip-172-31-34-132.eu-west-3.compute.internal", "ansible_hostname": "ip-172-31-34-132", "ansible_nodename": "ip-172-31-34-132", "ansible_domain": "eu-west-3.compute.internal", "ansible_userspace_bits": "64", "ansible_architecture": "x86_64", "ansible_userspace_architecture": "x86_64", "ansible_machine_id": "ec2d9810af32d8e7087829a36bbeb2d4", "ansible_ssh_host_key_rsa_public": "AAAAB3NzaC1yc2EAAAADAQABAAABgQC2F5a5qQpkr6T2bD6SbYr9do4qf/GBD2U8Y1INvXYiheZnqGodxaD2JI5Fan4WSya85Ku2qyaiuJ1rPr2+GAW8HRv7pgMhU++1C+7IL8PZgoY5Qcsfn72wRYPvBjiCu0o2/0v4UsTsiqiFCErpNz/jBeL/HPE21b2fxpkF+tzWOLmgC5DsYegpp1nQdUl/+5ZBbo1JymaRDQS9SifpTjiugm6IbTbRa4Ur7tLcN8nuEWlHSp4e+N8geyLFBfCSmQYsZihYQMjYMfOP302CWqeXJnT3hOYDCxz1z62d6i8nV1ZWa9s42cpIslqCKeW+k9QN8HibOlfU+XYUzgY+OdEgD9HfitOFlvg46PvQjVIpRag8kYIRcwaKmmtqZzod1sz+8JBRqWe/pK53XMyC8agEZXCdfPX3umBMHvz6y/3yW/LWgHF6QyWGqclBrqEMgbfH+LV6asdw6/U3mSVoDyhgIFTn+wS+kBZAOjhtGPDef0gjY4G5B0km7NlfEmHx7QU=", "ansible_ssh_host_key_rsa_public_keytype": "ssh-rsa", "ansible_ssh_host_key_ecdsa_public": "AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMkyKbC8mq0ftuPkeW6gpdjo6S45T0Wljn97WnQ7KjumUoYq5tc5LZDAH3CFuld8cz8M2YjvGhtoLRMSr3DAags=", "ansible_ssh_host_key_ecdsa_public_keytype": "ecdsa-sha2-nistp256", "ansible_ssh_host_key_ed25519_public": "AAAAC3NzaC1lZDI1NTE5AAAAIOD/2Y7GpeEozxEli184APqsjIwHDqgDdBQppu7F/Dpb", "ansible_ssh_host_key_ed25519_public_keytype": "ssh-ed25519", "ansible_user_id": "root", "ansible_user_uid": 0, "ansible_user_gid": 0, "ansible_user_gecos": "root", "ansible_user_dir": "/root", "ansible_user_shell": "/bin/bash", "ansible_real_user_id": 0, "ansible_effective_user_id": 0, "ansible_real_group_id": 0, "ansible_effective_group_id": 0, "ansible_distribution": "Ubuntu", "ansible_distribution_release": "noble", "ansible_distribution_version": "24.04", "ansible_distribution_major_version": "24", "ansible_distribution_file_path": "/etc/os-release", "ansible_distribution_file_variety": "Debian", "ansible_distribution_file_parsed": true, "ansible_os_family": "Debian", "ansible_selinux_python_present": true, "ansible_selinux": {"status": "disabled"}, "ansible_system_capabilities_enforced": "False", "ansible_system_capabilities": [], "ansible_virtualization_type": "xen", "ansible_virtualization_role": "guest", "ansible_virtualization_tech_guest": ["xen"], "ansible_virtualization_tech_host": [], "ansible_cmdline": {"BOOT_IMAGE": "/vmlinuz-6.8.0-1016-aws", "root": "PARTUUID=1eb94c54-dcc4-4822-bf70-addb7ca9d294", "ro": true, "console": "ttyS0", "nvme_core.io_timeout": "4294967295", "panic": "-1"}, "ansible_proc_cmdline": {"BOOT_IMAGE": "/vmlinuz-6.8.0-1016-aws", "root": "PARTUUID=1eb94c54-dcc4-4822-bf70-addb7ca9d294", "ro": true, "console": ["tty1", "ttyS0"], "nvme_core.io_timeout": "4294967295", "panic": "-1"}, "ansible_fibre_channel_wwn": [], "ansible_apparmor": {"status": "enabled"}, "ansible_interfaces": ["lo", "enX0"], "ansible_lo": {"device": "lo", "mtu": 65536, "active": true, "type": "loopback", "promisc": false, "ipv4": {"address": "127.0.0.1", "broadcast": "", "netmask": "255.0.0.0", "network": "127.0.0.0", "prefix": "8"}, "ipv6": [{"address": "::1", "prefix": "128", "scope": "host"}], "features": {"rx_checksumming": "on [fixed]", "tx_checksumming": "on", "tx_checksum_ipv4": "off [fixed]", "tx_checksum_ip_generic": "on [fixed]", "tx_checksum_ipv6": "off [fixed]", "tx_checksum_fcoe_crc": "off [fixed]", "tx_checksum_sctp": "on [fixed]", "scatter_gather": "on", "tx_scatter_gather": "on [fixed]", "tx_scatter_gather_fraglist": "on [fixed]", "tcp_segmentation_offload": "on", "tx_tcp_segmentation": "on", "tx_tcp_ecn_segmentation": "on", "tx_tcp_mangleid_segmentation": "on", "tx_tcp6_segmentation": "on", "generic_segmentation_offload": "on", "generic_receive_offload": "on", "large_receive_offload": "off [fixed]", "rx_vlan_offload": "off [fixed]", "tx_vlan_offload": "off [fixed]", "ntuple_filters": "off [fixed]", "receive_hashing": "off [fixed]", "highdma": "on [fixed]", "rx_vlan_filter": "off [fixed]", "vlan_challenged": "on [fixed]", "tx_lockless": "on [fixed]", "netns_local": "on [fixed]", "tx_gso_robust": "off [fixed]", "tx_fcoe_segmentation": "off [fixed]", "tx_gre_segmentation": "off [fixed]", "tx_gre_csum_segmentation": "off [fixed]", "tx_ipxip4_segmentation": "off [fixed]", "tx_ipxip6_segmentation": "off [fixed]", "tx_udp_tnl_segmentation": "off [fixed]", "tx_udp_tnl_csum_segmentation": "off [fixed]", "tx_gso_partial": "off [fixed]", "tx_tunnel_remcsum_segmentation": "off [fixed]", "tx_sctp_segmentation": "on", "tx_esp_segmentation": "off [fixed]", "tx_udp_segmentation": "on", "tx_gso_list": "on", "fcoe_mtu": "off [fixed]", "tx_nocache_copy": "off [fixed]", "loopback": "on [fixed]", "rx_fcs": "off [fixed]", "rx_all": "off [fixed]", "tx_vlan_stag_hw_insert": "off [fixed]", "rx_vlan_stag_hw_parse": "off [fixed]", "rx_vlan_stag_filter": "off [fixed]", "l2_fwd_offload": "off [fixed]", "hw_tc_offload": "off [fixed]", "esp_hw_offload": "off [fixed]", "esp_tx_csum_hw_offload": "off [fixed]", "rx_udp_tunnel_port_offload": "off [fixed]", "tls_hw_tx_offload": "off [fixed]", "tls_hw_rx_offload": "off [fixed]", "rx_gro_hw": "off [fixed]", "tls_hw_record": "off [fixed]", "rx_gro_list": "off", "macsec_hw_offload": "off [fixed]", "rx_udp_gro_forwarding": "off", "hsr_tag_ins_offload": "off [fixed]", "hsr_tag_rm_offload": "off [fixed]", "hsr_fwd_offload": "off [fixed]", "hsr_dup_offload": "off [fixed]"}, "timestamping": [], "hw_timestamp_filters": []}, "ansible_enX0": {"device": "enX0", "macaddress": "0e:65:c1:78:89:25", "mtu": 9001, "active": true, "type": "ether", "pciid": "vif-0", "promisc": false, "ipv4": {"address": "172.31.34.132", "broadcast": "", "netmask": "255.255.240.0", "network": "172.31.32.0", "prefix": "20"}, "ipv6": [{"address": "fe80::c65:c1ff:fe78:8925", "prefix": "64", "scope": "link"}], "features": {"rx_checksumming": "on [fixed]", "tx_checksumming": "on", "tx_checksum_ipv4": "on [fixed]", "tx_checksum_ip_generic": "off [fixed]", "tx_checksum_ipv6": "on", "tx_checksum_fcoe_crc": "off [fixed]", "tx_checksum_sctp": "off [fixed]", "scatter_gather": "on", "tx_scatter_gather": "on", "tx_scatter_gather_fraglist": "off [fixed]", "tcp_segmentation_offload": "on", "tx_tcp_segmentation": "on", "tx_tcp_ecn_segmentation": "off [fixed]", "tx_tcp_mangleid_segmentation": "off", "tx_tcp6_segmentation": "on", "generic_segmentation_offload": "on", "generic_receive_offload": "on", "large_receive_offload": "off [fixed]", "rx_vlan_offload": "off [fixed]", "tx_vlan_offload": "off [fixed]", "ntuple_filters": "off [fixed]", "receive_hashing": "off [fixed]", "highdma": "off [fixed]", "rx_vlan_filter": "off [fixed]", "vlan_challenged": "off [fixed]", "tx_lockless": "off [fixed]", "netns_local": "off [fixed]", "tx_gso_robust": "on [fixed]", "tx_fcoe_segmentation": "off [fixed]", "tx_gre_segmentation": "off [fixed]", "tx_gre_csum_segmentation": "off [fixed]", "tx_ipxip4_segmentation": "off [fixed]", "tx_ipxip6_segmentation": "off [fixed]", "tx_udp_tnl_segmentation": "off [fixed]", "tx_udp_tnl_csum_segmentation": "off [fixed]", "tx_gso_partial": "off [fixed]", "tx_tunnel_remcsum_segmentation": "off [fixed]", "tx_sctp_segmentation": "off [fixed]", "tx_esp_segmentation": "off [fixed]", "tx_udp_segmentation": "off [fixed]", "tx_gso_list": "off [fixed]", "fcoe_mtu": "off [fixed]", "tx_nocache_copy": "off", "loopback": "off [fixed]", "rx_fcs": "off [fixed]", "rx_all": "off [fixed]", "tx_vlan_stag_hw_insert": "off [fixed]", "rx_vlan_stag_hw_parse": "off [fixed]", "rx_vlan_stag_filter": "off [fixed]", "l2_fwd_offload": "off [fixed]", "hw_tc_offload": "off [fixed]", "esp_hw_offload": "off [fixed]", "esp_tx_csum_hw_offload": "off [fixed]", "rx_udp_tunnel_port_offload": "off [fixed]", "tls_hw_tx_offload": "off [fixed]", "tls_hw_rx_offload": "off [fixed]", "rx_gro_hw": "off [fixed]", "tls_hw_record": "off [fixed]", "rx_gro_list": "off", "macsec_hw_offload": "off [fixed]", "rx_udp_gro_forwarding": "off", "hsr_tag_ins_offload": "off [fixed]", "hsr_tag_rm_offload": "off [fixed]", "hsr_fwd_offload": "off [fixed]", "hsr_dup_offload": "off [fixed]"}, "timestamping": [], "hw_timestamp_filters": []}, "ansible_default_ipv4": {"gateway": "172.31.32.1", "interface": "enX0", "address": "172.31.34.132", "broadcast": "", "netmask": "255.255.240.0", "network": "172.31.32.0", "prefix": "20", "macaddress": "0e:65:c1:78:89:25", "mtu": 9001, "type": "ether", "alias": "enX0"}, "ansible_default_ipv6": {}, "ansible_all_ipv4_addresses": ["172.31.34.132"], "ansible_all_ipv6_addresses": ["fe80::c65:c1ff:fe78:8925"], "ansible_hostnqn": "", "ansible_pkg_mgr": "apt", "ansible_env": {"SUDO_GID": "1000", "MAIL": "/var/mail/root", "USER": "root", "HOME": "/root", "SUDO_UID": "1000", "LOGNAME": "root", "TERM": "xterm-256color", "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin", "LANG": "C.UTF-8", "SUDO_COMMAND": "/bin/sh -c echo BECOME-SUCCESS-axmtyqysjnorhoxzqgrhcdkezvemffic ; /usr/bin/python3 /home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737/AnsiballZ_setup.py", "SHELL": "/bin/bash", "SUDO_USER": "ubuntu", "PWD": "/home/ubuntu"}, "ansible_local": {}, "ansible_date_time": {"year": "2024", "month": "12", "weekday": "Friday", "weekday_number": "5", "weeknumber": "49", "day": "06", "hour": "14", "minute": "58", "second": "55", "epoch": "1733497135", "epoch_int": "1733497135", "date": "2024-12-06", "time": "14:58:55", "iso8601_micro": "2024-12-06T14:58:55.427423Z", "iso8601": "2024-12-06T14:58:55Z", "iso8601_basic": "20241206T145855427423", "iso8601_basic_short": "20241206T145855", "tz": "UTC", "tz_dst": "UTC", "tz_offset": "+0000"}, "ansible_service_mgr": "systemd", "ansible_is_chroot": false, "ansible_dns": {"nameservers": ["127.0.0.53"], "options": {"edns0": true, "trust-ad": true}, "search": ["eu-west-3.compute.internal"]}, "ansible_fips": false, "ansible_processor": ["0", "GenuineIntel", "Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz"], "ansible_processor_count": 1, "ansible_processor_cores": 1, "ansible_processor_threads_per_core": 1, "ansible_processor_vcpus": 1, "ansible_processor_nproc": 1, "ansible_memtotal_mb": 957, "ansible_memfree_mb": 465, "ansible_swaptotal_mb": 0, "ansible_swapfree_mb": 0, "ansible_memory_mb": {"real": {"total": 957, "used": 492, "free": 465}, "nocache": {"free": 746, "used": 211}, "swap": {"total": 0, "free": 0, "used": 0, "cached": 0}}, "ansible_bios_date": "08/24/2006", "ansible_bios_vendor": "Xen", "ansible_bios_version": "4.11.amazon", "ansible_board_asset_tag": "NA", "ansible_board_name": "NA", "ansible_board_serial": "NA", "ansible_board_vendor": "NA", "ansible_board_version": "NA", "ansible_chassis_asset_tag": "NA", "ansible_chassis_serial": "NA", "ansible_chassis_vendor": "Xen", "ansible_chassis_version": "NA", "ansible_form_factor": "Other", "ansible_product_name": "HVM domU", "ansible_product_serial": "ec2d9810-af32-d8e7-0878-29a36bbeb2d4", "ansible_product_uuid": "ec2d9810-af32-d8e7-0878-29a36bbeb2d4", "ansible_product_version": "4.11.amazon", "ansible_system_vendor": "Xen", "ansible_devices": {"loop1": {"virtual": 1, "links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "vendor": null, "model": null, "sas_address": null, "sas_device_handle": null, "removable": "0", "support_discard": "4096", "partitions": {}, "rotational": "0", "scheduler_mode": "none", "sectors": "113992", "sectorsize": "512", "size": "55.66 MB", "host": "", "holders": []}, "xvda": {"virtual": 1, "links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "vendor": null, "model": null, "sas_address": null, "sas_device_handle": null, "removable": "0", "support_discard": "512", "partitions": {"xvda16": {"links": {"ids": [], "uuids": ["0ba0e88d-6fc6-4c61-959c-7f0b822fb99f"], "labels": ["BOOT"], "masters": []}, "start": "227328", "sectors": "1869825", "sectorsize": 512, "size": "913.00 MB", "uuid": "0ba0e88d-6fc6-4c61-959c-7f0b822fb99f", "holders": []}, "xvda14": {"links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "start": "2048", "sectors": "8192", "sectorsize": 512, "size": "4.00 MB", "uuid": null, "holders": []}, "xvda1": {"links": {"ids": [], "uuids": ["52269511-418a-4537-8d26-76d8d3d2438a"], "labels": ["cloudimg-rootfs"], "masters": []}, "start": "2099200", "sectors": "14677983", "sectorsize": 512, "size": "7.00 GB", "uuid": "52269511-418a-4537-8d26-76d8d3d2438a", "holders": []}, "xvda15": {"links": {"ids": [], "uuids": ["F2CE-39BF"], "labels": ["UEFI"], "masters": []}, "start": "10240", "sectors": "217088", "sectorsize": 512, "size": "106.00 MB", "uuid": "F2CE-39BF", "holders": []}}, "rotational": "0", "scheduler_mode": "mq-deadline", "sectors": "16777216", "sectorsize": "512", "size": "8.00 GB", "host": "", "holders": []}, "loop6": {"virtual": 1, "links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "vendor": null, "model": null, "sas_address": null, "sas_device_handle": null, "removable": "0", "support_discard": "512", "partitions": {}, "rotational": "1", "scheduler_mode": "none", "sectors": "0", "sectorsize": "512", "size": "0.00 Bytes", "host": "", "holders": []}, "loop4": {"virtual": 1, "links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "vendor": null, "model": null, "sas_address": null, "sas_device_handle": null, "removable": "0", "support_discard": "512", "partitions": {}, "rotational": "1", "scheduler_mode": "none", "sectors": "0", "sectorsize": "512", "size": "0.00 Bytes", "host": "", "holders": []}, "loop2": {"virtual": 1, "links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "vendor": null, "model": null, "sas_address": null, "sas_device_handle": null, "removable": "0", "support_discard": "4096", "partitions": {}, "rotational": "0", "scheduler_mode": "none", "sectors": "79520", "sectorsize": "512", "size": "38.83 MB", "host": "", "holders": []}, "loop0": {"virtual": 1, "links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "vendor": null, "model": null, "sas_address": null, "sas_device_handle": null, "removable": "0", "support_discard": "4096", "partitions": {}, "rotational": "0", "scheduler_mode": "none", "sectors": "51688", "sectorsize": "512", "size": "25.24 MB", "host": "", "holders": []}, "loop7": {"virtual": 1, "links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "vendor": null, "model": null, "sas_address": null, "sas_device_handle": null, "removable": "0", "support_discard": "512", "partitions": {}, "rotational": "1", "scheduler_mode": "none", "sectors": "0", "sectorsize": "512", "size": "0.00 Bytes", "host": "", "holders": []}, "loop5": {"virtual": 1, "links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "vendor": null, "model": null, "sas_address": null, "sas_device_handle": null, "removable": "0", "support_discard": "512", "partitions": {}, "rotational": "1", "scheduler_mode": "none", "sectors": "0", "sectorsize": "512", "size": "0.00 Bytes", "host": "", "holders": []}, "loop3": {"virtual": 1, "links": {"ids": [], "uuids": [], "labels": [], "masters": []}, "vendor": null, "model": null, "sas_address": null, "sas_device_handle": null, "removable": "0", "support_discard": "4096", "partitions": {}, "rotational": "0", "scheduler_mode": "none", "sectors": "0", "sectorsize": "512", "size": "0.00 Bytes", "host": "", "holders": []}}, "ansible_device_links": {"ids": {}, "uuids": {"xvda1": ["52269511-418a-4537-8d26-76d8d3d2438a"], "xvda16": ["0ba0e88d-6fc6-4c61-959c-7f0b822fb99f"], "xvda15": ["F2CE-39BF"]}, "labels": {"xvda1": ["cloudimg-rootfs"], "xvda15": ["UEFI"], "xvda16": ["BOOT"]}, "masters": {}}, "ansible_uptime_seconds": 22, "ansible_lvm": {"lvs": {}, "vgs": {}, "pvs": {}}, "ansible_mounts": [{"mount": "/", "device": "/dev/root", "fstype": "ext4", "options": "rw,relatime,discard,errors=remount-ro,commit=30", "size_total": 7203201024, "size_available": 5527650304, "block_size": 4096, "block_total": 1758594, "block_available": 1349524, "block_used": 409070, "inode_total": 917504, "inode_available": 839363, "inode_used": 78141, "uuid": "52269511-418a-4537-8d26-76d8d3d2438a"}, {"mount": "/snap/amazon-ssm-agent/7993", "device": "/dev/loop0", "fstype": "squashfs", "options": "ro,nodev,relatime,errors=continue,threads=single", "size_total": 26476544, "size_available": 0, "block_size": 131072, "block_total": 202, "block_available": 0, "block_used": 202, "inode_total": 16, "inode_available": 0, "inode_used": 16, "uuid": "N/A"}, {"mount": "/snap/core18/2829", "device": "/dev/loop1", "fstype": "squashfs", "options": "ro,nodev,relatime,errors=continue,threads=single", "size_total": 58458112, "size_available": 0, "block_size": 131072, "block_total": 446, "block_available": 0, "block_used": 446, "inode_total": 10944, "inode_available": 0, "inode_used": 10944, "uuid": "N/A"}, {"mount": "/snap/snapd/21759", "device": "/dev/loop2", "fstype": "squashfs", "options": "ro,nodev,relatime,errors=continue,threads=single", "size_total": 40763392, "size_available": 0, "block_size": 131072, "block_total": 311, "block_available": 0, "block_used": 311, "inode_total": 651, "inode_available": 0, "inode_used": 651, "uuid": "N/A"}, {"mount": "/boot", "device": "/dev/xvda16", "fstype": "ext4", "options": "rw,relatime", "size_total": 923156480, "size_available": 779644928, "block_size": 4096, "block_total": 225380, "block_available": 190343, "block_used": 35037, "inode_total": 58496, "inode_available": 57895, "inode_used": 601, "uuid": "0ba0e88d-6fc6-4c61-959c-7f0b822fb99f"}, {"mount": "/boot/efi", "device": "/dev/xvda15", "fstype": "vfat", "options": "rw,relatime,fmask=0077,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro", "size_total": 109395456, "size_available": 103000064, "block_size": 512, "block_total": 213663, "block_available": 201172, "block_used": 12491, "inode_total": 0, "inode_available": 0, "inode_used": 0, "uuid": "F2CE-39BF"}], "ansible_python": {"version": {"major": 3, "minor": 12, "micro": 3, "releaselevel": "final", "serial": 0}, "version_info": [3, 12, 3, "final", 0], "executable": "/usr/bin/python3", "has_sslcontext": true, "type": "cpython"}, "ansible_iscsi_iqn": "", "ansible_lsb": {"id": "Ubuntu", "description": "Ubuntu 24.04.1 LTS", "release": "24.04", "codename": "noble", "major_release": "24"}, "ansible_loadavg": {"1m": 0.56787109375, "5m": 0.13037109375, "15m": 0.04296875}, "gather_subset": ["all"], "module_setup": true}, "invocation": {"module_args": {"gather_subset": ["all"], "gather_timeout": 10, "filter": [], "fact_path": "/etc/ansible/facts.d"}}}\r\n', b'Shared connection to ec2-51-44-7-75.eu-west-3.compute.amazonaws.com closed.\r\n')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'rm -f -r /home/ubuntu/.ansible/tmp/ansible-tmp-1733497132.7755687-7397-47112676450737/ > /dev/null 2>&1 && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+ok: [ec2-51-44-7-75.eu-west-3.compute.amazonaws.com]
+Read vars_file 'common.yml'
+Read vars_file 'common.yml'
+Read vars_file 'common.yml'
+
+TASK [Debug OS] ****************************************************************
+task path: /home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml:10
+ok: [ec2-51-44-7-75.eu-west-3.compute.amazonaws.com] => {
+    "msg": "Système détecté : Ubuntu 24.04"
+}
+Read vars_file 'common.yml'
+
+TASK [Mettre à jour le système] ************************************************
+task path: /home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml:15
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'echo ~ubuntu && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'/home/ubuntu\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ubuntu/.ansible/tmp `"&& mkdir "` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497136.2132196-7440-28432824372991 `" && echo ansible-tmp-1733497136.2132196-7440-28432824372991="` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497136.2132196-7440-28432824372991 `" ) && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'ansible-tmp-1733497136.2132196-7440-28432824372991=/home/ubuntu/.ansible/tmp/ansible-tmp-1733497136.2132196-7440-28432824372991\n', b'')
+Using module file /usr/lib/python3/dist-packages/ansible/modules/apt.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> PUT /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmpbfap7xf1 TO /home/ubuntu/.ansible/tmp/ansible-tmp-1733497136.2132196-7440-28432824372991/AnsiballZ_apt.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' '[ec2-51-44-7-75.eu-west-3.compute.amazonaws.com]'
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'sftp> put /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmpbfap7xf1 /home/ubuntu/.ansible/tmp/ansible-tmp-1733497136.2132196-7440-28432824372991/AnsiballZ_apt.py\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'chmod u+x /home/ubuntu/.ansible/tmp/ansible-tmp-1733497136.2132196-7440-28432824372991/ /home/ubuntu/.ansible/tmp/ansible-tmp-1733497136.2132196-7440-28432824372991/AnsiballZ_apt.py && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' -tt ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'sudo -H -S -n  -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-wmmshcjkakxtknrpngsalqbpotqfdnlt ; /usr/bin/python3 /home/ubuntu/.ansible/tmp/ansible-tmp-1733497136.2132196-7440-28432824372991/AnsiballZ_apt.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+Escalation succeeded
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'\r\n{"changed": false, "msg": "Reading package lists...\\nBuilding dependency tree...\\nReading state information...\\nCalculating upgrade...\\n0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.\\n", "stdout": "Reading package lists...\\nBuilding dependency tree...\\nReading state information...\\nCalculating upgrade...\\n0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.\\n", "stderr": "", "invocation": {"module_args": {"name": "*", "state": "latest", "package": ["*"], "update_cache_retries": 5, "update_cache_retry_max_delay": 12, "cache_valid_time": 0, "purge": false, "force": false, "upgrade": null, "dpkg_options": "force-confdef,force-confold", "autoremove": false, "autoclean": false, "fail_on_autoremove": false, "only_upgrade": false, "force_apt_get": false, "clean": false, "allow_unauthenticated": false, "allow_downgrade": false, "allow_change_held_packages": false, "lock_timeout": 60, "update_cache": null, "deb": null, "default_release": null, "install_recommends": null, "policy_rc_d": null}}}\r\n', b'Shared connection to ec2-51-44-7-75.eu-west-3.compute.amazonaws.com closed.\r\n')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'rm -f -r /home/ubuntu/.ansible/tmp/ansible-tmp-1733497136.2132196-7440-28432824372991/ > /dev/null 2>&1 && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+ok: [ec2-51-44-7-75.eu-west-3.compute.amazonaws.com] => {
+    "changed": false,
+    "invocation": {
+        "module_args": {
+            "allow_change_held_packages": false,
+            "allow_downgrade": false,
+            "allow_unauthenticated": false,
+            "autoclean": false,
+            "autoremove": false,
+            "cache_valid_time": 0,
+            "clean": false,
+            "deb": null,
+            "default_release": null,
+            "dpkg_options": "force-confdef,force-confold",
+            "fail_on_autoremove": false,
+            "force": false,
+            "force_apt_get": false,
+            "install_recommends": null,
+            "lock_timeout": 60,
+            "name": "*",
+            "only_upgrade": false,
+            "package": [
+                "*"
+            ],
+            "policy_rc_d": null,
+            "purge": false,
+            "state": "latest",
+            "update_cache": null,
+            "update_cache_retries": 5,
+            "update_cache_retry_max_delay": 12,
+            "upgrade": null
+        }
+    },
+    "msg": "Reading package lists...\nBuilding dependency tree...\nReading state information...\nCalculating upgrade...\n0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.\n",
+    "stderr": "",
+    "stderr_lines": [],
+    "stdout": "Reading package lists...\nBuilding dependency tree...\nReading state information...\nCalculating upgrade...\n0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.\n",
+    "stdout_lines": [
+        "Reading package lists...",
+        "Building dependency tree...",
+        "Reading state information...",
+        "Calculating upgrade...",
+        "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded."
+    ]
+}
+Read vars_file 'common.yml'
+
+TASK [Vérifier si Git est installé] ********************************************
+task path: /home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml:22
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'echo ~ubuntu && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'/home/ubuntu\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ubuntu/.ansible/tmp `"&& mkdir "` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497138.3160655-7454-160181651002269 `" && echo ansible-tmp-1733497138.3160655-7454-160181651002269="` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497138.3160655-7454-160181651002269 `" ) && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'ansible-tmp-1733497138.3160655-7454-160181651002269=/home/ubuntu/.ansible/tmp/ansible-tmp-1733497138.3160655-7454-160181651002269\n', b'')
+Using module file /usr/lib/python3/dist-packages/ansible/modules/command.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> PUT /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmp1hhvb3t2 TO /home/ubuntu/.ansible/tmp/ansible-tmp-1733497138.3160655-7454-160181651002269/AnsiballZ_command.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' '[ec2-51-44-7-75.eu-west-3.compute.amazonaws.com]'
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'sftp> put /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmp1hhvb3t2 /home/ubuntu/.ansible/tmp/ansible-tmp-1733497138.3160655-7454-160181651002269/AnsiballZ_command.py\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'chmod u+x /home/ubuntu/.ansible/tmp/ansible-tmp-1733497138.3160655-7454-160181651002269/ /home/ubuntu/.ansible/tmp/ansible-tmp-1733497138.3160655-7454-160181651002269/AnsiballZ_command.py && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' -tt ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'sudo -H -S -n  -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-cmdcknrflutlosqjnhjbjblluwpcexlk ; /usr/bin/python3 /home/ubuntu/.ansible/tmp/ansible-tmp-1733497138.3160655-7454-160181651002269/AnsiballZ_command.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+Escalation succeeded
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'\r\n{"changed": true, "stdout": "git version 2.43.0", "stderr": "", "rc": 0, "cmd": ["git", "--version"], "start": "2024-12-06 14:58:59.565676", "end": "2024-12-06 14:58:59.593675", "delta": "0:00:00.027999", "msg": "", "invocation": {"module_args": {"_raw_params": "git --version", "_uses_shell": false, "stdin_add_newline": true, "strip_empty_ends": true, "argv": null, "chdir": null, "executable": null, "creates": null, "removes": null, "stdin": null}}}\r\n', b'Shared connection to ec2-51-44-7-75.eu-west-3.compute.amazonaws.com closed.\r\n')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'rm -f -r /home/ubuntu/.ansible/tmp/ansible-tmp-1733497138.3160655-7454-160181651002269/ > /dev/null 2>&1 && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+ok: [ec2-51-44-7-75.eu-west-3.compute.amazonaws.com] => {
+    "changed": false,
+    "cmd": [
+        "git",
+        "--version"
+    ],
+    "delta": "0:00:00.027999",
+    "end": "2024-12-06 14:58:59.593675",
+    "failed_when_result": false,
+    "invocation": {
+        "module_args": {
+            "_raw_params": "git --version",
+            "_uses_shell": false,
+            "argv": null,
+            "chdir": null,
+            "creates": null,
+            "executable": null,
+            "removes": null,
+            "stdin": null,
+            "stdin_add_newline": true,
+            "strip_empty_ends": true
+        }
+    },
+    "msg": "",
+    "rc": 0,
+    "start": "2024-12-06 14:58:59.565676",
+    "stderr": "",
+    "stderr_lines": [],
+    "stdout": "git version 2.43.0",
+    "stdout_lines": [
+        "git version 2.43.0"
+    ]
+}
+Read vars_file 'common.yml'
+
+TASK [Installer Git si non présent] ********************************************
+task path: /home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml:28
+skipping: [ec2-51-44-7-75.eu-west-3.compute.amazonaws.com] => {
+    "changed": false,
+    "skip_reason": "Conditional result was False"
+}
+Read vars_file 'common.yml'
+
+TASK [Installer la dépendance libasound2t64] ***********************************
+task path: /home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml:35
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'echo ~ubuntu && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'/home/ubuntu\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ubuntu/.ansible/tmp `"&& mkdir "` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497139.938152-7465-129114294275369 `" && echo ansible-tmp-1733497139.938152-7465-129114294275369="` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497139.938152-7465-129114294275369 `" ) && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'ansible-tmp-1733497139.938152-7465-129114294275369=/home/ubuntu/.ansible/tmp/ansible-tmp-1733497139.938152-7465-129114294275369\n', b'')
+Using module file /usr/lib/python3/dist-packages/ansible/modules/apt.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> PUT /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmp5jawe0tm TO /home/ubuntu/.ansible/tmp/ansible-tmp-1733497139.938152-7465-129114294275369/AnsiballZ_apt.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' '[ec2-51-44-7-75.eu-west-3.compute.amazonaws.com]'
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'sftp> put /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmp5jawe0tm /home/ubuntu/.ansible/tmp/ansible-tmp-1733497139.938152-7465-129114294275369/AnsiballZ_apt.py\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'chmod u+x /home/ubuntu/.ansible/tmp/ansible-tmp-1733497139.938152-7465-129114294275369/ /home/ubuntu/.ansible/tmp/ansible-tmp-1733497139.938152-7465-129114294275369/AnsiballZ_apt.py && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' -tt ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'sudo -H -S -n  -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-dxhcangxdcnpvnslwevpyfveymtcymvu ; /usr/bin/python3 /home/ubuntu/.ansible/tmp/ansible-tmp-1733497139.938152-7465-129114294275369/AnsiballZ_apt.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+Escalation succeeded
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'\r\n{"changed": true, "stdout": "Reading package lists...\\nBuilding dependency tree...\\nReading state information...\\nThe following additional packages will be installed:\\n  alsa-topology-conf alsa-ucm-conf libasound2-data\\nSuggested packages:\\n  alsa-utils libasound2-plugins\\nThe following NEW packages will be installed:\\n  alsa-topology-conf alsa-ucm-conf libasound2-data libasound2t64\\n0 upgraded, 4 newly installed, 0 to remove and 60 not upgraded.\\nNeed to get 499 kB of archives.\\nAfter this operation, 2719 kB of additional disk space will be used.\\nGet:1 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble/main amd64 alsa-topology-conf all 1.2.5.1-2 [15.5 kB]\\nGet:2 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble/main amd64 libasound2-data all 1.2.11-1build2 [21.0 kB]\\nGet:3 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble/main amd64 libasound2t64 amd64 1.2.11-1build2 [399 kB]\\nGet:4 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble-updates/main amd64 alsa-ucm-conf all 1.2.10-1ubuntu5.3 [64.2 kB]\\nFetched 499 kB in 0s (18.4 MB/s)\\nSelecting previously unselected package alsa-topology-conf.\\r\\n(Reading database ... \\r(Reading database ... 5%\\r(Reading database ... 10%\\r(Reading database ... 15%\\r(Reading database ... 20%\\r(Reading database ... 25%\\r(Reading database ... 30%\\r(Reading database ... 35%\\r(Reading database ... 40%\\r(Reading database ... 45%\\r(Reading database ... 50%\\r(Reading database ... 55%\\r(Reading database ... 60%\\r(Reading database ... 65%\\r(Reading database ... 70%\\r(Reading database ... 75%\\r(Reading database ... 80%\\r(Reading database ... 85%\\r(Reading database ... 90%\\r(Reading database ... 95%\\r(Reading database ... 100%\\r(Reading database ... 67836 files and directories currently installed.)\\r\\nPreparing to unpack .../alsa-topology-conf_1.2.5.1-2_all.deb ...\\r\\nUnpacking alsa-topology-conf (1.2.5.1-2) ...\\r\\nSelecting previously unselected package libasound2-data.\\r\\nPreparing to unpack .../libasound2-data_1.2.11-1build2_all.deb ...\\r\\nUnpacking libasound2-data (1.2.11-1build2) ...\\r\\nSelecting previously unselected package libasound2t64:amd64.\\r\\nPreparing to unpack .../libasound2t64_1.2.11-1build2_amd64.deb ...\\r\\nUnpacking libasound2t64:amd64 (1.2.11-1build2) ...\\r\\nSelecting previously unselected package alsa-ucm-conf.\\r\\nPreparing to unpack .../alsa-ucm-conf_1.2.10-1ubuntu5.3_all.deb ...\\r\\nUnpacking alsa-ucm-conf (1.2.10-1ubuntu5.3) ...\\r\\nSetting up libasound2-data (1.2.11-1build2) ...\\r\\nSetting up libasound2t64:amd64 (1.2.11-1build2) ...\\r\\nSetting up alsa-topology-conf (1.2.5.1-2) ...\\r\\nSetting up alsa-ucm-conf (1.2.10-1ubuntu5.3) ...\\r\\nProcessing triggers for libc-bin (2.39-0ubuntu8.3) ...\\r\\n\\nRunning kernel seems to be up-to-date.\\n\\nNo services need to be restarted.\\n\\nNo containers need to be restarted.\\n\\nNo user sessions are running outdated binaries.\\n\\nNo VM guests are running outdated hypervisor (qemu) binaries on this host.\\n", "stderr": "", "diff": {}, "cache_updated": true, "cache_update_time": 1733497147, "invocation": {"module_args": {"name": "libasound2t64", "state": "present", "update_cache": true, "package": ["libasound2t64"], "update_cache_retries": 5, "update_cache_retry_max_delay": 12, "cache_valid_time": 0, "purge": false, "force": false, "upgrade": null, "dpkg_options": "force-confdef,force-confold", "autoremove": false, "autoclean": false, "fail_on_autoremove": false, "only_upgrade": false, "force_apt_get": false, "clean": false, "allow_unauthenticated": false, "allow_downgrade": false, "allow_change_held_packages": false, "lock_timeout": 60, "deb": null, "default_release": null, "install_recommends": null, "policy_rc_d": null}}}\r\n', b'Shared connection to ec2-51-44-7-75.eu-west-3.compute.amazonaws.com closed.\r\n')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'rm -f -r /home/ubuntu/.ansible/tmp/ansible-tmp-1733497139.938152-7465-129114294275369/ > /dev/null 2>&1 && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+changed: [ec2-51-44-7-75.eu-west-3.compute.amazonaws.com] => {
+    "cache_update_time": 1733497147,
+    "cache_updated": true,
+    "changed": true,
+    "diff": {},
+    "invocation": {
+        "module_args": {
+            "allow_change_held_packages": false,
+            "allow_downgrade": false,
+            "allow_unauthenticated": false,
+            "autoclean": false,
+            "autoremove": false,
+            "cache_valid_time": 0,
+            "clean": false,
+            "deb": null,
+            "default_release": null,
+            "dpkg_options": "force-confdef,force-confold",
+            "fail_on_autoremove": false,
+            "force": false,
+            "force_apt_get": false,
+            "install_recommends": null,
+            "lock_timeout": 60,
+            "name": "libasound2t64",
+            "only_upgrade": false,
+            "package": [
+                "libasound2t64"
+            ],
+            "policy_rc_d": null,
+            "purge": false,
+            "state": "present",
+            "update_cache": true,
+            "update_cache_retries": 5,
+            "update_cache_retry_max_delay": 12,
+            "upgrade": null
+        }
+    },
+    "stderr": "",
+    "stderr_lines": [],
+    "stdout": "Reading package lists...\nBuilding dependency tree...\nReading state information...\nThe following additional packages will be installed:\n  alsa-topology-conf alsa-ucm-conf libasound2-data\nSuggested packages:\n  alsa-utils libasound2-plugins\nThe following NEW packages will be installed:\n  alsa-topology-conf alsa-ucm-conf libasound2-data libasound2t64\n0 upgraded, 4 newly installed, 0 to remove and 60 not upgraded.\nNeed to get 499 kB of archives.\nAfter this operation, 2719 kB of additional disk space will be used.\nGet:1 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble/main amd64 alsa-topology-conf all 1.2.5.1-2 [15.5 kB]\nGet:2 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble/main amd64 libasound2-data all 1.2.11-1build2 [21.0 kB]\nGet:3 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble/main amd64 libasound2t64 amd64 1.2.11-1build2 [399 kB]\nGet:4 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble-updates/main amd64 alsa-ucm-conf all 1.2.10-1ubuntu5.3 [64.2 kB]\nFetched 499 kB in 0s (18.4 MB/s)\nSelecting previously unselected package alsa-topology-conf.\r\n(Reading database ... \r(Reading database ... 5%\r(Reading database ... 10%\r(Reading database ... 15%\r(Reading database ... 20%\r(Reading database ... 25%\r(Reading database ... 30%\r(Reading database ... 35%\r(Reading database ... 40%\r(Reading database ... 45%\r(Reading database ... 50%\r(Reading database ... 55%\r(Reading database ... 60%\r(Reading database ... 65%\r(Reading database ... 70%\r(Reading database ... 75%\r(Reading database ... 80%\r(Reading database ... 85%\r(Reading database ... 90%\r(Reading database ... 95%\r(Reading database ... 100%\r(Reading database ... 67836 files and directories currently installed.)\r\nPreparing to unpack .../alsa-topology-conf_1.2.5.1-2_all.deb ...\r\nUnpacking alsa-topology-conf (1.2.5.1-2) ...\r\nSelecting previously unselected package libasound2-data.\r\nPreparing to unpack .../libasound2-data_1.2.11-1build2_all.deb ...\r\nUnpacking libasound2-data (1.2.11-1build2) ...\r\nSelecting previously unselected package libasound2t64:amd64.\r\nPreparing to unpack .../libasound2t64_1.2.11-1build2_amd64.deb ...\r\nUnpacking libasound2t64:amd64 (1.2.11-1build2) ...\r\nSelecting previously unselected package alsa-ucm-conf.\r\nPreparing to unpack .../alsa-ucm-conf_1.2.10-1ubuntu5.3_all.deb ...\r\nUnpacking alsa-ucm-conf (1.2.10-1ubuntu5.3) ...\r\nSetting up libasound2-data (1.2.11-1build2) ...\r\nSetting up libasound2t64:amd64 (1.2.11-1build2) ...\r\nSetting up alsa-topology-conf (1.2.5.1-2) ...\r\nSetting up alsa-ucm-conf (1.2.10-1ubuntu5.3) ...\r\nProcessing triggers for libc-bin (2.39-0ubuntu8.3) ...\r\n\nRunning kernel seems to be up-to-date.\n\nNo services need to be restarted.\n\nNo containers need to be restarted.\n\nNo user sessions are running outdated binaries.\n\nNo VM guests are running outdated hypervisor (qemu) binaries on this host.\n",
+    "stdout_lines": [
+        "Reading package lists...",
+        "Building dependency tree...",
+        "Reading state information...",
+        "The following additional packages will be installed:",
+        "  alsa-topology-conf alsa-ucm-conf libasound2-data",
+        "Suggested packages:",
+        "  alsa-utils libasound2-plugins",
+        "The following NEW packages will be installed:",
+        "  alsa-topology-conf alsa-ucm-conf libasound2-data libasound2t64",
+        "0 upgraded, 4 newly installed, 0 to remove and 60 not upgraded.",
+        "Need to get 499 kB of archives.",
+        "After this operation, 2719 kB of additional disk space will be used.",
+        "Get:1 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble/main amd64 alsa-topology-conf all 1.2.5.1-2 [15.5 kB]",
+        "Get:2 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble/main amd64 libasound2-data all 1.2.11-1build2 [21.0 kB]",
+        "Get:3 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble/main amd64 libasound2t64 amd64 1.2.11-1build2 [399 kB]",
+        "Get:4 http://eu-west-3.ec2.archive.ubuntu.com/ubuntu noble-updates/main amd64 alsa-ucm-conf all 1.2.10-1ubuntu5.3 [64.2 kB]",
+        "Fetched 499 kB in 0s (18.4 MB/s)",
+        "Selecting previously unselected package alsa-topology-conf.",
+        "(Reading database ... ",
+        "(Reading database ... 5%",
+        "(Reading database ... 10%",
+        "(Reading database ... 15%",
+        "(Reading database ... 20%",
+        "(Reading database ... 25%",
+        "(Reading database ... 30%",
+        "(Reading database ... 35%",
+        "(Reading database ... 40%",
+        "(Reading database ... 45%",
+        "(Reading database ... 50%",
+        "(Reading database ... 55%",
+        "(Reading database ... 60%",
+        "(Reading database ... 65%",
+        "(Reading database ... 70%",
+        "(Reading database ... 75%",
+        "(Reading database ... 80%",
+        "(Reading database ... 85%",
+        "(Reading database ... 90%",
+        "(Reading database ... 95%",
+        "(Reading database ... 100%",
+        "(Reading database ... 67836 files and directories currently installed.)",
+        "Preparing to unpack .../alsa-topology-conf_1.2.5.1-2_all.deb ...",
+        "Unpacking alsa-topology-conf (1.2.5.1-2) ...",
+        "Selecting previously unselected package libasound2-data.",
+        "Preparing to unpack .../libasound2-data_1.2.11-1build2_all.deb ...",
+        "Unpacking libasound2-data (1.2.11-1build2) ...",
+        "Selecting previously unselected package libasound2t64:amd64.",
+        "Preparing to unpack .../libasound2t64_1.2.11-1build2_amd64.deb ...",
+        "Unpacking libasound2t64:amd64 (1.2.11-1build2) ...",
+        "Selecting previously unselected package alsa-ucm-conf.",
+        "Preparing to unpack .../alsa-ucm-conf_1.2.10-1ubuntu5.3_all.deb ...",
+        "Unpacking alsa-ucm-conf (1.2.10-1ubuntu5.3) ...",
+        "Setting up libasound2-data (1.2.11-1build2) ...",
+        "Setting up libasound2t64:amd64 (1.2.11-1build2) ...",
+        "Setting up alsa-topology-conf (1.2.5.1-2) ...",
+        "Setting up alsa-ucm-conf (1.2.10-1ubuntu5.3) ...",
+        "Processing triggers for libc-bin (2.39-0ubuntu8.3) ...",
+        "",
+        "Running kernel seems to be up-to-date.",
+        "",
+        "No services need to be restarted.",
+        "",
+        "No containers need to be restarted.",
+        "",
+        "No user sessions are running outdated binaries.",
+        "",
+        "No VM guests are running outdated hypervisor (qemu) binaries on this host."
+    ]
+}
+Read vars_file 'common.yml'
+
+TASK [Télécharger VSCode] ******************************************************
+task path: /home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml:43
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'echo ~ubuntu && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'/home/ubuntu\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /home/ubuntu/.ansible/tmp `"&& mkdir "` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497156.8390234-7515-244341906445410 `" && echo ansible-tmp-1733497156.8390234-7515-244341906445410="` echo /home/ubuntu/.ansible/tmp/ansible-tmp-1733497156.8390234-7515-244341906445410 `" ) && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'ansible-tmp-1733497156.8390234-7515-244341906445410=/home/ubuntu/.ansible/tmp/ansible-tmp-1733497156.8390234-7515-244341906445410\n', b'')
+Using module file /usr/lib/python3/dist-packages/ansible/modules/get_url.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> PUT /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmpa7vjjpou TO /home/ubuntu/.ansible/tmp/ansible-tmp-1733497156.8390234-7515-244341906445410/AnsiballZ_get_url.py
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' '[ec2-51-44-7-75.eu-west-3.compute.amazonaws.com]'
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'sftp> put /home/serveur/.ansible/tmp/ansible-local-7387ygs_9bkc/tmpa7vjjpou /home/ubuntu/.ansible/tmp/ansible-tmp-1733497156.8390234-7515-244341906445410/AnsiballZ_get_url.py\n', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'chmod u+x /home/ubuntu/.ansible/tmp/ansible-tmp-1733497156.8390234-7515-244341906445410/ /home/ubuntu/.ansible/tmp/ansible-tmp-1733497156.8390234-7515-244341906445410/AnsiballZ_get_url.py && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' -tt ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'sudo -H -S -n  -u root /bin/sh -c '"'"'"'"'"'"'"'"'echo BECOME-SUCCESS-bfbfebmtcwfovlvauyrvdabuunyohheh ; /usr/bin/python3 /home/ubuntu/.ansible/tmp/ansible-tmp-1733497156.8390234-7515-244341906445410/AnsiballZ_get_url.py'"'"'"'"'"'"'"'"' && sleep 0'"'"''
+Escalation succeeded
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (1, b'/tmp/ansible_get_url_payload_qaczvdm9/ansible_get_url_payload.zip/ansible/modules/get_url.py:609: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\r\n/tmp/ansible_get_url_payload_qaczvdm9/ansible_get_url_payload.zip/ansible/modules/get_url.py:398: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\r\n/tmp/ansible_get_url_payload_qaczvdm9/ansible_get_url_payload.zip/ansible/modules/get_url.py:401: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\r\n\r\n{"url": "https://go.microsoft.com/fwlink/?LinkID=760868", "dest": "/tmp/vscode.deb", "elapsed": 0, "failed": true, "msg": "An unknown error occurred: HTTPSConnection.__init__() got an unexpected keyword argument \'cert_file\'", "invocation": {"module_args": {"url": "https://go.microsoft.com/fwlink/?LinkID=760868", "dest": "/tmp/vscode.deb", "force": false, "http_agent": "ansible-httpget", "use_proxy": true, "validate_certs": true, "force_basic_auth": false, "use_gssapi": false, "backup": false, "checksum": "", "timeout": 10, "unredirected_headers": [], "decompress": true, "use_netrc": true, "unsafe_writes": false, "url_username": null, "url_password": null, "client_cert": null, "client_key": null, "headers": null, "tmp_dest": null, "ciphers": null, "mode": null, "owner": null, "group": null, "seuser": null, "serole": null, "selevel": null, "setype": null, "attributes": null}}}\r\n', b'Shared connection to ec2-51-44-7-75.eu-west-3.compute.amazonaws.com closed.\r\n')
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> Failed to connect to the host via ssh: Shared connection to ec2-51-44-7-75.eu-west-3.compute.amazonaws.com closed.
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> ESTABLISH SSH CONNECTION FOR USER: ubuntu
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o 'IdentityFile="/home/serveur/ApiAWS/api-aws-backend/terraform/jordanprime40@gmail.com-vm-b54693/id_rsa"' -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o 'User="ubuntu"' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o 'ControlPath="/home/serveur/.ansible/cp/37a00d6205"' ec2-51-44-7-75.eu-west-3.compute.amazonaws.com '/bin/sh -c '"'"'rm -f -r /home/ubuntu/.ansible/tmp/ansible-tmp-1733497156.8390234-7515-244341906445410/ > /dev/null 2>&1 && sleep 0'"'"''
+<ec2-51-44-7-75.eu-west-3.compute.amazonaws.com> (0, b'', b'')
+fatal: [ec2-51-44-7-75.eu-west-3.compute.amazonaws.com]: FAILED! => {
+    "changed": false,
+    "dest": "/tmp/vscode.deb",
+    "elapsed": 0,
+    "invocation": {
+        "module_args": {
+            "attributes": null,
+            "backup": false,
+            "checksum": "",
+            "ciphers": null,
+            "client_cert": null,
+            "client_key": null,
+            "decompress": true,
+            "dest": "/tmp/vscode.deb",
+            "force": false,
+            "force_basic_auth": false,
+            "group": null,
+            "headers": null,
+            "http_agent": "ansible-httpget",
+            "mode": null,
+            "owner": null,
+            "selevel": null,
+            "serole": null,
+            "setype": null,
+            "seuser": null,
+            "timeout": 10,
+            "tmp_dest": null,
+            "unredirected_headers": [],
+            "unsafe_writes": false,
+            "url": "https://go.microsoft.com/fwlink/?LinkID=760868",
+            "url_password": null,
+            "url_username": null,
+            "use_gssapi": false,
+            "use_netrc": true,
+            "use_proxy": true,
+            "validate_certs": true
+        }
+    },
+    "msg": "An unknown error occurred: HTTPSConnection.__init__() got an unexpected keyword argument 'cert_file'",
+    "url": "https://go.microsoft.com/fwlink/?LinkID=760868"
+}
+
+PLAY RECAP *********************************************************************
+ec2-51-44-7-75.eu-west-3.compute.amazonaws.com : ok=5    changed=1    unreachable=0    failed=1    skipped=1    rescued=0    ignored=0   
+

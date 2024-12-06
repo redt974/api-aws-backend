@@ -79,9 +79,9 @@ router.post("/create", async (req, res) => {
     // Choisir le playbook à exécuter en fonction du système d'exploitation
     let playbook = '';
     if (os === 'Windows 10' || os === 'Windows 11') {
-      playbook = '../playbooks/vm_windows.yml';  
+      playbook = '/home/serveur/ApiAWS/api-aws-backend/playbooks/vm-windows.yml';  
     } else {
-      playbook = '../playbooks/vm_linux.yml'; 
+      playbook = '/home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml'; 
     }
 
     // Exécution du playbook Ansible
