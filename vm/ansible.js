@@ -47,14 +47,14 @@ const generateAnsibleInventory = (vm, filePath) => {
   const inventoryContent = `[all]\nec2-${transformedIp}.${process.env.AWS_REGION}.compute.amazonaws.com ansible_user=${vm.ansibleUser} ansible_ssh_private_key_file="${vm.ssh_private_key}"`;
 
   return fs.writeFile(filePath, inventoryContent.trim())
-    .then(() => console.log('Fichier d\'inventaire créé avec succès !'))
+    .then(() => console.log("Fichier d'inventaire créé avec succès !"))
     .catch((err) => {
       throw new Error(`Erreur lors de la création du fichier d'inventaire : ${err.message}`);
     });
 };
 
 // Fonction pour exécuter le playbook Ansible
-const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions, userEmail, userName, userPassword, instance_id, privateKeyPath, ansibleUser, public_ip) => {
+const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions, userName, userPassword, privateKeyPath, ansibleUser, public_ip) => {
   try {
     // Vérifiez que la VM est prête
     await isVMReady({ public_ip, ansibleUser, ssh_private_key: privateKeyPath });
@@ -63,10 +63,8 @@ const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions,
     const extraVars = JSON.stringify({
       software_list: software,
       vscode_extensions: extensions,
-      user_email: userEmail,
-      user_name: userName,
+      ansible_user: ansibleUser,
       user_password: userPassword,
-      instance_id: instance_id
     });
 
     // Construction de la commande Ansible avec redirection des logs
@@ -75,7 +73,7 @@ const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions,
       -i ${inventoryPath} \\
       --private-key ${privateKeyPath} \\
       --extra-vars '${extraVars}' \\
-      -vvv --ssh-common-args="-o StrictHostKeyChecking=no" > ansible_debug.log 2>&1
+      -vvv --ssh-common-args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" > ansible_debug.log 2>&1
     `;
 
     console.log("Exécution de la commande Ansible :\n", ansibleCommand);

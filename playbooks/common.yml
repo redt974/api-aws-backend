@@ -1,7 +1,0 @@
-software_list: []
-vscode_extensions: []
-desktop_environment: "xfce4"
-user_password: "{{ user_password }}"
-user_name: "{{ user_name }}"
-user_email: "{{ user_email }}"
-instance_id: "{{ instance_id }}"
