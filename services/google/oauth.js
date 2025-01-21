@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { OAuth2Client } = require('google-auth-library');
-const db = require('../../mysql/db');
+const db = require('../../config/db');
 const jwt = require('jsonwebtoken');
-const { isOwnerEmail } = require('../../authentification/isAdmin');
+const { isOwnerEmail } = require('../../auth/isAdmin');
 
 const secretKey = process.env.JWT_SECRET;
 
