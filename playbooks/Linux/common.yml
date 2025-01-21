@@ -1,0 +1,4 @@
+software_list: []
+vscode_extensions: []
+user_password: "{{ user_password }}"
+ansible_user: "{{ ansible_user }}"

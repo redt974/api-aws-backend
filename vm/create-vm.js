@@ -59,7 +59,7 @@ router.post("/create", async (req, res) => {
     const tfConfigPath = path.join(userDir, "main.tf");
 
     // Création du fichier Terraform
-    createTerraformConfig(ami, vm_name, tfConfigPath);
+    createTerraformConfig(ami, vm_name, user_password, tfConfigPath);
 
     // Exécution de Terraform
     const { public_ip, instance_id, private_key } = await runTerraform(userDir);
@@ -79,9 +79,9 @@ router.post("/create", async (req, res) => {
     // Choisir le playbook à exécuter en fonction du système d'exploitation
     let playbook = '';
     if (os === 'Windows 10' || os === 'Windows 11') {
-      playbook = '/home/serveur/ApiAWS/api-aws-backend/playbooks/vm-windows.yml';  
+      playbook = '~/api-aws/api-aws-backend/playbooks/Windows/vm-windows.yml';  
     } else {
-      playbook = '/home/serveur/ApiAWS/api-aws-backend/playbooks/vm-linux.yml'; 
+      playbook = '~/api-aws/api-aws-backend/playbooks/Linux/vm-linux.yml'; 
     }
 
     // Exécution du playbook Ansible
@@ -90,10 +90,8 @@ router.post("/create", async (req, res) => {
       playbook, 
       software,
       extensions,
-      user_email,
       user_name,
       user_password,
-      instance_id,
       privateKeyPath,
       ansibleUser, 
       public_ip
