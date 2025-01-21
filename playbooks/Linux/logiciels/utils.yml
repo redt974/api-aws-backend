@@ -49,11 +49,11 @@
         name: nano
         state: present
 
-    # ### Installer tree ###
-    # - name: Installer tree
-    #   package:
-    #     name: tree
-    #     state: present
+    ### Installer tree ###
+    - name: Installer tree
+      package:
+        name: tree
+        state: present
 
     ### Installer net-tools ###
     - name: Installer net-tools
@@ -61,23 +61,23 @@
         name: net-tools
         state: present
 
-    # ### Installer traceroute ###
-    # - name: Installer traceroute
-    #   package:
-    #     name: traceroute
-    #     state: present
+    ### Installer traceroute ###
+    - name: Installer traceroute
+      package:
+        name: traceroute
+        state: present
 
-    # ### Installer nmap ###
-    # - name: Installer nmap
-    #   package:
-    #     name: nmap
-    #     state: present
+    ### Installer nmap ###
+    - name: Installer nmap
+      package:
+        name: nmap
+        state: present
 
-    # ### Installer build-essential ###
-    # - name: Installer build-essential
-    #   package:
-    #     name: build-essential
-    #     state: present
+    ### Installer build-essential ###
+    - name: Installer build-essential
+      package:
+        name: build-essential
+        state: present
 
     # ### Installer software-properties-common ###
     # - name: Installer software-properties-common

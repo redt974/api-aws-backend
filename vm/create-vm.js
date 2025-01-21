@@ -59,7 +59,7 @@ router.post("/create", async (req, res) => {
     const tfConfigPath = path.join(userDir, "main.tf");
 
     // Création du fichier Terraform
-    createTerraformConfig(ami, vm_name, tfConfigPath);
+    createTerraformConfig(ami, vm_name, user_password, tfConfigPath);
 
     // Exécution de Terraform
     const { public_ip, instance_id, private_key } = await runTerraform(userDir);

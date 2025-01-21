@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { exec } = require("child_process");
 
-function createTerraformConfig(ami, vm_name, outputPath) {
+function createTerraformConfig(ami, vm_name, user_password, outputPath) {
   const config = `
 provider "aws" {
   region = "${process.env.AWS_REGION}"
@@ -21,8 +21,13 @@ resource "aws_instance" "vm" {
   ami               = "${ami}"
   instance_type     = "${process.env.INSTANCE_TYPE}"
   key_name          = aws_key_pair.key.key_name
-  vpc_security_group_ids = [aws_security_group.vm_sg.id]  # Association du Security Group
-  
+  vpc_security_group_ids = [aws_security_group.vm_sg.id]
+ 
+  user_data = <<-EOF
+    #!/bin/bash
+    echo "ubuntu:${user_password}" | chpasswd
+  EOF
+ 
   tags = {
     Name = "${vm_name}"
   }

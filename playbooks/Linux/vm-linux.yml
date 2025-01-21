@@ -20,6 +20,11 @@
         state: latest
       when: ansible_facts.distribution in ["Debian", "Ubuntu"]
 
+    ### Mettre à jour les dépôts ###
+    - name: Mettre à jour les dépôts
+      ansible.builtin.apt:
+        update_cache: yes
+
     ### Installation des Logiciels essentiels : ###
     - name: Installer de logiciels essentiels
       import_tasks: logiciels/utils.yml

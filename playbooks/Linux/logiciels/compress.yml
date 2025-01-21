@@ -6,14 +6,14 @@
       ansible.builtin.stat:
         path: /etc/profile.d/custom_software_paths.sh
       register: file_check
-
+ 
     - name: Créer le fichier custom_software_paths.sh
       ansible.builtin.file:
         path: /etc/profile.d/custom_software_paths.sh
         state: touch
         mode: '0755'
       when: file_check.stat.exists == false
-
+ 
     # Étape 2 : Créer des dossiers pour les logiciels
     - name: Créer des dossiers pour les logiciels
       ansible.builtin.file:
@@ -25,7 +25,7 @@
         - { name: "postman" }
         - { name: "idea" }
       when: item.name in software_list
-
+ 
     # Étape 3 : Télécharger les fichiers des logiciels
     - name: Télécharger les fichiers .tar.gz des logiciels
       ansible.builtin.get_url:
@@ -36,13 +36,13 @@
         - { name: "postman", url: "https://dl.pstmn.io/download/latest/linux64" }
         - { name: "idea", url: "https://download.jetbrains.com/idea/ideaIC-2023.3.1.tar.gz" }
       when: item.name in software_list
-
-    # Étape 4 : Décompresser les fichiers .tar.gz
+ 
+    # Étape 4 : Installer les outils nécessaires
     - name: Installer les outils nécessaires
       ansible.builtin.package:
         name: tar
         state: present
-
+ 
     # Étape 5 : Décompresser les fichiers
     - name: Décompresser les fichiers .tar.gz
       ansible.builtin.unarchive:
@@ -54,7 +54,7 @@
         - { name: "postman" }
         - { name: "idea" }
       when: item.name in software_list
-
+ 
     # Étape 6 : Ajouter les alias dans un fichier global
     - name: Ajouter les alias dans le fichier .bashrc de l'utilisateur
       ansible.builtin.lineinfile:
@@ -65,15 +65,20 @@
         - { name: "android-studio", executable_path: "/opt/android-studio/android-studio/bin/studio.sh" }
         - { name: "postman", executable_path: "/opt/postman/Postman/Postman" }
         - { name: "idea", executable_path: "/opt/idea/idea-IC-233.11799.300/bin/idea.sh" }
-    
+   
     # Étape 7 : Recharger .bashrc pour les sessions actuelles
     - name: Recharger .bashrc pour les sessions actuelles
       ansible.builtin.shell: source /home/{{ ansible_user }}/.bashrc
       args:
         executable: /bin/bash
-
+ 
     # Étape 8 : Nettoyer les fichiers compressés
     - name: Supprimer les fichiers .tar.gz après extraction
       ansible.builtin.file:
         path: "/opt/{{ item.name }}/{{ item.name }}.tar.gz"
         state: absent
+      loop:
+        - { name: "android-studio" }
+        - { name: "postman" }
+        - { name: "idea" }
+      when: item.name in software_list
