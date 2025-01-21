@@ -38,6 +38,10 @@ const reinitialisationRoute = require('./auth/reinitialisation');
 const refreshtokenRoute = require('./auth/refresh_token');
 const rememberMeRoute = require('./auth/rememberme');
 
+// Sign In Google
+const google_authRouter = require('./services/google/oauth');
+const google_requestRouter = require('./services/google/request');
+
 // Routes de gestion des VMs
 const getVmRoute = require("./vm/get-vm");
 const createVmRoute = require("./vm/create-vm");
@@ -56,6 +60,10 @@ app.use('/api/reset_mdp', reinitialisationRoute);
 
 app.use('/api/remember-me', rememberMeRoute);
 app.use('/api/refresh-token', refreshtokenRoute);
+
+// Routes pour l'authentification avec Google
+app.use('/google/oauth', google_authRouter);
+app.use('/google/request', google_requestRouter); 
 
 // Routes pour les VMs
 app.use("/api/vm", authMiddleware, getVmRoute);
