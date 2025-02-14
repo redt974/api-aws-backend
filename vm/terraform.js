@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { exec } = require("child_process");
 
-function createTerraformConfig(ami, vm_name, user_password, outputPath) {
+function createTerraformConfig(ami, vm_name, ansibleUser, user_password, outputPath) {
   const config = `
 provider "aws" {
   region = "${process.env.AWS_REGION}"
@@ -23,10 +23,12 @@ resource "aws_instance" "vm" {
   key_name          = aws_key_pair.key.key_name
   vpc_security_group_ids = [aws_security_group.vm_sg.id]
  
-  user_data = <<-EOF
-    #!/bin/bash
-    echo "ubuntu:${user_password}" | chpasswd
-  EOF
+  user_data = <<EOF
+#!/bin/bash
+apt update -y
+apt install -y python3
+echo "${ansibleUser}:${user_password}" | sudo chpasswd
+EOF
  
   tags = {
     Name = "${vm_name}"

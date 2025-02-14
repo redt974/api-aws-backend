@@ -7,13 +7,14 @@ const { getUserEmail } = require("../auth/user");
 const { createTerraformConfig, runTerraform } = require("./terraform");
 const { generateAnsibleInventory, runAnsiblePlaybook } = require("./ansible");
 const pool = require("../config/db");
+const { io } = require("../index.js");
 
 router.post("/create", async (req, res) => {
   let { os, software, extensions, user_name, user_password } = req.body;
 
   // Normalisation pour garantir que ce sont toujours des tableaux
-  software = Array.isArray(software) ? software : [software];
-  extensions = Array.isArray(extensions) ? extensions : [extensions];
+  software = Array.isArray(software) ? software : (software ? [software] : []);
+  extensions = Array.isArray(extensions) ? extensions : (extensions ? [extensions] : []);  
   
   const user_id = req.user.id;  // Récupère l'ID utilisateur injecté par le middleware
 
@@ -33,17 +34,26 @@ router.post("/create", async (req, res) => {
 
   if (!ami) return res.status(400).json({ message: "OS non pris en charge."});
 
-  const userMapping = {
-    Ubuntu: 'ubuntu',
-    Debian: 'debian',
-    Kali: 'kali',
-    "Windows 10": 'Administrator',
-    "Windows 11": 'Administrator',
-  };
+  // const userMapping = {
+  //   Ubuntu: 'ubuntu',
+  //   Debian: 'debian',
+  //   Kali: 'kali',
+  //   "Windows 10": 'Administrator',
+  //   "Windows 11": 'Administrator',
+  // };
 
-  const ansibleUser = userMapping[os];
+  // const ansibleUser = userMapping[os];
+
+  const socketId = req.headers["socket-id"]; // Récupérer l'ID socket du client
+  const emitProgress = (message) => {
+    if (socketId && io.sockets.sockets.get(socketId)) {
+      io.to(socketId).emit("progress", message);
+    }
+    
+  };  
 
   try {
+    emitProgress("🔄 Initialisation de la création de la VM...");
     // Vérification des VMs actives de l'utilisateur
     const existingVM = await pool.query("SELECT COUNT(*) FROM vms WHERE user_id = $1 AND expires_at > NOW()", [user_id]);
     if (parseInt(existingVM.rows[0].count) >= 1) {
@@ -58,50 +68,66 @@ router.post("/create", async (req, res) => {
 
     const tfConfigPath = path.join(userDir, "main.tf");
 
+    emitProgress("🔄 Création de la VM...");
     // Création du fichier Terraform
-    createTerraformConfig(ami, vm_name, user_password, tfConfigPath);
+    createTerraformConfig(ami, vm_name, user_name, user_password, tfConfigPath);
 
+    emitProgress("🔄 Lancement de la VM...");
     // Exécution de Terraform
-    const { public_ip, instance_id, private_key } = await runTerraform(userDir);
-
-    if (!public_ip || !instance_id || !private_key) {
-      throw new Error("Les sorties Terraform sont incomplètes ou incorrectes.");
+    try {
+      const { public_ip, instance_id, private_key } = await runTerraform(userDir);
+      if (!public_ip || !instance_id || !private_key) {
+        throw new Error("Les sorties Terraform sont incomplètes ou incorrectes.");
+      }
+    } catch (err) {
+      emitProgress("❌ Erreur lors du déploiement de la VM.");
+      console.error("Erreur Terraform :", err.message);
+      return res.status(500).json({ message: "Erreur lors du déploiement de la VM." });
     }
+    
+    emitProgress("✅ VM créée avec succès...");
 
     // Sauvegarde de la clé privée
     const privateKeyPath = path.join(userDir, "id_rsa");
     fs.writeFileSync(privateKeyPath, private_key, { mode: 0o600 });
 
+    emitProgress("🔄 Installation des logiciels dans la VM...");
     // Création de l'inventaire Ansible
     const inventoryPath = path.join(userDir, "inventory");
-    await generateAnsibleInventory({ public_ip: public_ip, ansibleUser: ansibleUser, ssh_private_key: privateKeyPath }, inventoryPath);
+    await generateAnsibleInventory({ public_ip, user_name, ssh_private_key: privateKeyPath }, inventoryPath);
     
-    // Choisir le playbook à exécuter en fonction du système d'exploitation
-    let playbook = '';
-    if (os === 'Windows 10' || os === 'Windows 11') {
-      playbook = '~/api-aws/api-aws-backend/playbooks/Windows/vm-windows.yml';  
-    } else {
-      playbook = '~/api-aws/api-aws-backend/playbooks/Linux/vm-linux.yml'; 
+    const playbook = path.resolve(__dirname, `../playbooks/${os.includes("Windows") ? "Windows" : "Linux"}/vm-${os.toLowerCase()}.yml`);
+
+    emitProgress("🔄 Installation des logiciels dans la VM en cours...");
+    // Exécution du playbook Ansible
+    try {
+      await runAnsiblePlaybook(
+        inventoryPath,
+        playbook, 
+        software,
+        extensions,
+        user_name,
+        user_password,
+        privateKeyPath,
+        public_ip,
+        emitProgress
+      );
+      if (!inventoryPath || !playbook || !software|| !extensions|| !user_name|| !user_password|| !privateKeyPath|| !public_ip) {
+        throw new Error("Les sorties Ansible sont incomplètes ou incorrectes.");
+      }
+    } catch (err) {
+      emitProgress("❌ Erreur lors de l'installation des logiciels de la VM.");
+      console.error("Erreur Ansible :", err.message);
+      return res.status(500).json({ message: "Erreur lors de l'installation des logiciels de la VM" });
     }
 
-    // Exécution du playbook Ansible
-    await runAnsiblePlaybook(
-      inventoryPath,
-      playbook, 
-      software,
-      extensions,
-      user_name,
-      user_password,
-      privateKeyPath,
-      ansibleUser, 
-      public_ip
-    );
-
+    emitProgress("🌐 Déploiement de la VM en cours...");
     // Insertion dans la base de données
     const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000); // Expiration dans 12 heures
     const result = await pool.query("INSERT INTO vms (user_id, os, software, public_ip, private_key, expires_at, name, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id", 
       [user_id, os, software, public_ip, privateKeyPath, expiresAt, vm_name, instance_id]);
 
+    emitProgress("🚀 VM créée avec succès et prête !");
     res.status(201).json({
       vm_id: result.rows[0].id,
       user_id: result.rows[0].user_id,
@@ -112,6 +138,7 @@ router.post("/create", async (req, res) => {
       message: "VM créée avec succès."
     });
   } catch (err) {
+    emitProgress("❌ Erreur lors de la création de la VM !");
     console.error("Erreur lors de la création de la VM :", err.message);
     res.status(500).json({ message: "Erreur interne du serveur." });
   }

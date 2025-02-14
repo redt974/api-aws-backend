@@ -4,6 +4,8 @@ const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { exec } = require("child_process");
+const http = require("http");
+const { Server } = require("socket.io");
 const pool = require("./config/db");
 
 // Middleware d'authentification JWT
@@ -14,17 +16,53 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+
+// socket.io
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*", // Autorise toutes les origines, à restreindre en prod
+        methods: ["GET", "POST"]
+    }
+});
+
+io.on("connection", (socket) => {
+    console.log("Nouvelle connexion WebSocket :", socket.id);
+
+    socket.on("disconnect", () => {
+        console.log("Utilisateur déconnecté :", socket.id);
+    });
+});
+
+module.exports = { app, server, io };
+
+server.listen("3002", () => {
+    console.log(`Serveur socket.io lancé sur le port 3002`);
+});
+
+
 // Middlewares globaux
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-const corsOptions = {
-    origin: 'http://localhost:3000',  // FRONTEND
-    credentials: true,                // Permet l'envoi des cookies (ou autres informations d'authentification)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Méthodes HTTP autorisées
-};
+// const corsOptions = {
+//     origin: 'http://localhost:3000',  // FRONTEND
+//     credentials: true,                // Permet l'envoi des cookies (ou autres informations d'authentification)
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Méthodes HTTP autorisées
+// };
 
-app.use(cors(corsOptions));  // Applique la configuration CORS avec les options définies
+// app.use(cors(corsOptions));  // Applique la configuration CORS avec les options définies
+
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");  // Autorise toutes les origines
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);  // Répondre aux requêtes préflight directement
+    }
+    next();
+});
 
 
 // Routes de gestion pour l'authentification
@@ -72,6 +110,11 @@ app.use("/api/vm", authMiddleware, windowspasswordRoute);
 app.use("/api/vm", authMiddleware, downloadSSHRoute);
 // app.use("/api/vm", authMiddleware, downloadVPNRoute);
 app.use("/api/vm", authMiddleware, deleteVmRoute);
+
+app.get("/", (req, res) => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("API AWS\n");
+});
 
 // Supprimer une VM automatiquement après expiration
 async function cleanupExpiredVMs() {
