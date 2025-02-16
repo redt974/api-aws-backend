@@ -108,6 +108,8 @@ router.post("/create", async (req, res) => {
         extensions,
         user_name,
         user_password,
+        user_email,
+        instance_id,
         privateKeyPath,
         public_ip,
         emitProgress
@@ -131,10 +133,9 @@ router.post("/create", async (req, res) => {
     res.status(201).json({
       vm_id: result.rows[0].id,
       user_id: result.rows[0].user_id,
-      user_email: user_email,
+      user_name: user_name,
       instance_id: instance_id,
       ip: public_ip,
-      ssh_private_key: privateKeyPath,
       message: "VM créée avec succès."
     });
   } catch (err) {

@@ -57,7 +57,7 @@ const isVMReady = async (vm, timeout = 30000) => {
         console.log("La VM est prête.");
 
         // Commande SSH Debug
-        console.log(`ssh -i "${vm.ssh_private_key}" ${vm.ansibleUser}@ec2-${vm.public_ip.replace(/\./g, '-')}.${process.env.AWS_REGION}.compute.amazonaws.com`)
+        console.log(`ssh -i "Downloads\\${vm.user_email}-vm-${vm.instance_id}-id_rsa.pem" ${vm.ansibleUser}@ec2-${vm.public_ip.replace(/\./g, '-')}.${process.env.AWS_REGION}.compute.amazonaws.com`)
 
         return true;
       }
@@ -94,10 +94,10 @@ const extractAnsibleTasks = (output) => {
 };
 
 // Fonction pour exécuter le playbook Ansible
-const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions, user_name, user_password, privateKeyPath, public_ip, emitProgress) => {
+const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions, user_name, user_email, instance_id, user_password, privateKeyPath, public_ip, emitProgress) => {
   try {
     // Vérifiez que la VM est prête
-    await isVMReady({ public_ip, user_name, ssh_private_key: privateKeyPath });
+    await isVMReady({ public_ip, user_name, user_email, instance_id, ssh_private_key: privateKeyPath });
 
     // Préparation des variables supplémentaires pour Ansible
     const extraVars = JSON.stringify({
