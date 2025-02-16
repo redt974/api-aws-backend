@@ -7,7 +7,14 @@
         name: libasound2
         state: present
         update_cache: yes
-      when: ansible_facts.distribution in ["Debian", "Ubuntu"]
+      when: ansible_facts.distribution in ["Debian"]
+
+    - name: Installer la dépendance libasound2t64
+      apt:
+        name: libasound2
+        state: present
+        update_cache: yes
+      when: ansible_facts.distribution in ["Ubuntu"]
 
     ### Télécharger et installer Visual Studio Code ###
     - name: Télécharger VSCode

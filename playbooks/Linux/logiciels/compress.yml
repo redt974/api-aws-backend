@@ -87,3 +87,14 @@
       ansible.builtin.shell: source /home/{{ ansible_user }}/.bashrc
       args:
         executable: /bin/bash
+
+    # Étape 8 : Supprimer les fichiers .tar.gz après extraction
+    - name: Supprimer les fichiers .tar.gz après extraction
+      ansible.builtin.file:
+        path: "/opt/{{ item.name }}/{{ item.name }}.tar.gz"
+        state: absent
+      loop:
+        - { name: "android-studio" }
+        - { name: "postman" }
+        - { name: "idea" }
+      when: item.name in software_list
