@@ -50,7 +50,7 @@ router.get('/', async function (req, res) {
       process.env.GOOGLE_CLIENT_SECRET,
       redirectURL
     );
-    
+
     // Obtenir le token d'accès Google à partir du code d'autorisation
     const { tokens } = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
@@ -64,27 +64,27 @@ router.get('/', async function (req, res) {
     }
 
     // Vérifier si l'utilisateur existe déjà dans la base de données
-    const [existingUser] = await db.query('SELECT id FROM utilisateurs WHERE email = ?', [userData.email]);
+    const result = await db.query('SELECT id FROM utilisateurs WHERE email = $1', [userData.email]);
 
-    if (existingUser.length === 0) {
+    if (result.rows.length === 0) {
       // Si l'utilisateur n'existe pas, affichez une page et redirigez après 5 secondes vers la page d'inscription
       return res.status(401).send(`
-        <html>
-          <body>
-            <h1>Utilisateur non trouvé</h1>
-            <p>Vous devez vous inscrire pour accéder à ce service.</p>
-            <script>
-              setTimeout(() => {
-                window.location.href = 'http://${process.env.FRONT_URL}/inscription';
-              }, 5000);
-            </script>
-          </body>
-        </html>
-      `);
+    <html>
+      <body>
+        <h1>Utilisateur non trouvé</h1>
+        <p>Vous devez vous inscrire pour accéder à ce service.</p>
+        <script>
+          setTimeout(() => {
+            window.location.href = 'http://${process.env.FRONT_URL}/inscription';
+          }, 5000);
+        </script>
+      </body>
+    </html>
+  `);
     }
 
     // Récupérer l'ID de l'utilisateur
-    const id = existingUser[0].id;
+    const id = result.rows[0].id;
 
     // Vérifiez si l'email est celui du propriétaire et attribuez un rôle admin
     const isAdmin = isOwnerEmail(userData.email);
@@ -94,7 +94,7 @@ router.get('/', async function (req, res) {
 
     // Rediriger vers le frontend avec le token JWT
     res.redirect(303, `http://${process.env.FRONT_URL}/auth/google/redirect?token=${token}`);
-    
+
   } catch (err) {
     console.error('Error during OAuth2 process:', err);
     res.status(500).send('Internal Server Error');
