@@ -14,14 +14,14 @@ const authMiddleware = require('./auth/middleware');
 // Initialisation de l'application
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
-
+const port = process.env.PORT || 3001;
+const FRONT_URL = `http://${process.env.FRONT_URL}`; // ✅ Ajout d'une valeur par défaut
 
 // socket.io
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*", // Autorise toutes les origines, à restreindre en prod
+        origin: FRONT_URL, // ✅ Restreindre aux requêtes du frontend
         methods: ["GET", "POST"]
     }
 });
@@ -40,30 +40,24 @@ server.listen("3002", () => {
     console.log(`Serveur socket.io lancé sur le port 3002`);
 });
 
+// Injection de `io` dans `req` pour les routes qui en ont besoin
+app.use((req, res, next) => {
+    req.io = io;
+    next();
+});
 
 // Middlewares globaux
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// const corsOptions = {
-//     origin: 'http://localhost:3000',  // FRONTEND
-//     credentials: true,                // Permet l'envoi des cookies (ou autres informations d'authentification)
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Méthodes HTTP autorisées
-// };
+const corsOptions = {
+    origin: FRONT_URL,  // ✅ Utilisation de la variable sécurisée
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ["Content-Type", "Authorization", "socket-id"],
+    credentials: true // Permet l'envoi des cookies et headers d'authentification
+};
 
-// app.use(cors(corsOptions));  // Applique la configuration CORS avec les options définies
-
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");  // Autorise toutes les origines
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    if (req.method === "OPTIONS") {
-        return res.sendStatus(200);  // Répondre aux requêtes préflight directement
-    }
-    next();
-});
-
+app.use(cors(corsOptions)); // ✅ Utilisation unique du middleware cors
 
 // Routes de gestion pour l'authentification
 const inscriptionRoute = require('./auth/inscription');
@@ -85,8 +79,11 @@ const getVmRoute = require("./vm/get-vm");
 const createVmRoute = require("./vm/create-vm");
 const windowspasswordRoute = require("./vm/windows-password");
 const downloadSSHRoute = require("./vm/download-ssh");
-// const downloadVPNRoute = require("./vm/download-vpn");
+const downloadVPNRoute = require("./vm/download-vpn");
 const deleteVmRoute = require("./vm/delete-vm");
+
+// test
+const testRoute = require("./test");
 
 // Routes pour l'authentification
 app.use('/api/signup', inscriptionRoute);
@@ -108,8 +105,11 @@ app.use("/api/vm", authMiddleware, getVmRoute);
 app.use("/api/vm", authMiddleware, createVmRoute);
 app.use("/api/vm", authMiddleware, windowspasswordRoute);
 app.use("/api/vm", authMiddleware, downloadSSHRoute);
-// app.use("/api/vm", authMiddleware, downloadVPNRoute);
+app.use("/api/vm", authMiddleware, downloadVPNRoute);
 app.use("/api/vm", authMiddleware, deleteVmRoute);
+
+// test
+app.use("/api/test", testRoute);
 
 app.get("/", (req, res) => {
     res.writeHead(200, { "Content-Type": "text/plain" });
