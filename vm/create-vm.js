@@ -12,6 +12,8 @@ const { io } = require("../index.js");
 router.post("/create", async (req, res) => {
   let { os, software, extensions, user_name, user_password } = req.body;
 
+  const vpn_ip = "10.8.0.0/24";
+
   // Normalisation pour garantir que ce sont toujours des tableaux
   software = Array.isArray(software) ? software : (software ? [software] : []);
   extensions = Array.isArray(extensions) ? extensions : (extensions ? [extensions] : []);  
@@ -70,7 +72,7 @@ router.post("/create", async (req, res) => {
 
     emitProgress("🔄 Création de la VM...");
     // Création du fichier Terraform
-    createTerraformConfig(ami, vm_name, user_name, user_password, tfConfigPath);
+    createTerraformConfig(ami, vm_name, user_name, user_password, vpn_ip, tfConfigPath);
 
     emitProgress("🔄 Lancement de la VM...");
     // Exécution de Terraform
@@ -110,6 +112,7 @@ router.post("/create", async (req, res) => {
         user_password,
         user_email,
         instance_id,
+        vpn_ip,
         privateKeyPath,
         public_ip,
         emitProgress

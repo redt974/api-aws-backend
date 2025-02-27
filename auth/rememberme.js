@@ -17,12 +17,12 @@ router.post('/', async (req, res) => {
   try {
     // Décodage et validation du token JWT
     const decoded = jwt.verify(rememberMeToken, refreshSecretKey);
-    const { userId } = decoded;
+    const { id } = decoded;
 
     // Récupérer le hash du token et la date d'expiration en base
     const [users] = await db.query(
       'SELECT remember_me_token, remember_me_expiration FROM utilisateurs WHERE id = ?',
-      [userId]
+      [id]
     );
 
     if (users.length === 0) {
@@ -43,17 +43,17 @@ router.post('/', async (req, res) => {
     }
 
     // Générer un nouveau token d'accès
-    const accessToken = jwt.sign({ userId }, secretKey, { expiresIn: '30m' });
+    const accessToken = jwt.sign({ id }, secretKey, { expiresIn: '30m' });
 
     // Générer un nouveau token Remember Me
-    const newRememberMeToken = jwt.sign({ userId }, refreshSecretKey, { expiresIn: '7d' });
+    const newRememberMeToken = jwt.sign({ id }, refreshSecretKey, { expiresIn: '7d' });
     const newTokenHash = await bcrypt.hash(newRememberMeToken, 10);
 
     // Mettre à jour le token Remember Me en base
     const expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 jours
     await db.query(
       'UPDATE utilisateurs SET remember_me_token = ?, remember_me_expiration = ? WHERE id = ?',
-      [newTokenHash, expirationDate, userId]
+      [newTokenHash, expirationDate, id]
     );
 
     // Envoyer le nouveau cookie Remember Me

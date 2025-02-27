@@ -4,7 +4,7 @@ const { OAuth2Client } = require('google-auth-library');
 
 // Middleware pour gérer CORS
 router.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", `https://${process.env.FRONT_URL}`);
+  res.header("Access-Control-Allow-Origin", `http://${process.env.FRONT_URL}`);
   res.header("Access-Control-Allow-Credentials", 'true');
   res.header("Referrer-Policy", "no-referrer-when-downgrade");
   res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -17,7 +17,7 @@ router.use((req, res, next) => {
 
 // Route pour gérer l'authentification Google OAuth
 router.post('/', async function(req, res) {
-  const redirectURL = `https://${process.env.BACK_URL}/google/oauth`;
+  const redirectURL = `http://${process.env.BACK_URL}/google/oauth`;
 
   const oAuth2Client = new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,

@@ -46,13 +46,13 @@ const pool = new Pool({
     `);
     console.log("Table VMs");
 
-    await pool.query(`
-        INSERT INTO vms (user_id, os, software, public_ip, private_key, name, instance_id, expires_at) 
-        VALUES 
-        (1, 'Ubuntu 22.04', 'Nginx, MySQL, PHP', '192.168.1.10', 'PRIVATE_KEY_1', 'VM-1', 'i-abcdef123456', NOW() + INTERVAL '7 days'),
-        (1, 'Windows Server 2019', 'IIS, MSSQL', '192.168.1.11', 'PRIVATE_KEY_2', 'VM-2', 'i-abcdef654321', NOW() + INTERVAL '14 days'),
-        (1, 'Debian 12', 'Docker, PostgreSQL', '192.168.1.12', 'PRIVATE_KEY_3', 'VM-3', 'i-abcdef789012', NOW() + INTERVAL '10 days');
-    `);
+    // await pool.query(`
+    //     INSERT INTO vms (user_id, os, software, public_ip, private_key, name, instance_id, expires_at) 
+    //     VALUES 
+    //     (1, 'Ubuntu 22.04', 'Nginx, MySQL, PHP', '192.168.1.10', 'PRIVATE_KEY_1', 'VM-1', 'i-abcdef123456', NOW() + INTERVAL '7 days'),
+    //     (1, 'Windows Server 2019', 'IIS, MSSQL', '192.168.1.11', 'PRIVATE_KEY_2', 'VM-2', 'i-abcdef654321', NOW() + INTERVAL '14 days'),
+    //     (1, 'Debian 12', 'Docker, PostgreSQL', '192.168.1.12', 'PRIVATE_KEY_3', 'VM-3', 'i-abcdef789012', NOW() + INTERVAL '10 days');
+    // `);
 
     // Création de la table `reset_tokens`
     await pool.query(`

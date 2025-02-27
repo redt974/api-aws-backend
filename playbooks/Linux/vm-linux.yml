@@ -24,6 +24,10 @@
     - name: Mettre à jour les dépôts
       ansible.builtin.apt:
         update_cache: yes
+    
+    ### Installer OpenVPN et configurer un client ###
+    - name: Installer OpenVPN et configurer un client
+      import_tasks: logiciels/openvpn.yml
 
     ### Installation des Logiciels essentiels : ###
     - name: Installer de logiciels essentiels

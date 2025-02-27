@@ -1,0 +1,26 @@
+client
+dev tun
+proto udp
+remote {{ ansible_default_ipv4.address }} 1194
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+remote-cert-tls server
+cipher AES-256-GCM
+auth SHA256
+comp-lzo
+verb 3
+
+<ca>
+{{ lookup('file', '/etc/openvpn/client/ca.crt') }}
+</ca>
+<cert>
+{{ lookup('file', '/etc/openvpn/client/client1.crt') }}
+</cert>
+<key>
+{{ lookup('file', '/etc/openvpn/client/client1.key') }}
+</key>
+<tls-auth>
+{{ lookup('file', '/etc/openvpn/client/ta.key') }}
+</tls-auth>

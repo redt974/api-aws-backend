@@ -45,10 +45,10 @@ router.post('/', async (req, res) => {
     const newUserId = insertResult.rows[0].id; // Utilisation de `rows[0].id` pour obtenir l'ID du nouvel utilisateur
 
     // Générer un token JWT d'accès
-    const accessToken = jwt.sign({ userId: newUserId }, secretKey, { expiresIn: '30m' });
+    const accessToken = jwt.sign({ id: newUserId }, secretKey, { expiresIn: '30m' });
 
     // Générer un token JWT de rafraîchissement
-    const refreshToken = jwt.sign({ userId: newUserId }, refreshSecretKey, { expiresIn: '7d' });
+    const refreshToken = jwt.sign({ id: newUserId }, refreshSecretKey, { expiresIn: '7d' });
 
     // Envoyer le refresh token dans un cookie HttpOnly
     res.cookie('refreshToken', refreshToken, {

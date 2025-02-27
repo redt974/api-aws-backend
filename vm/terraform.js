@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { exec } = require("child_process");
 
-function createTerraformConfig(ami, vm_name, ansibleUser, user_password, outputPath) {
+function createTerraformConfig(ami, vm_name, ansibleUser, user_password, vpn_ip, outputPath) {
   const config = `
 provider "aws" {
   region = "${process.env.AWS_REGION}"
@@ -48,6 +48,15 @@ output "private_key_pem" {
   sensitive = true
 }
 
+resource "aws_eip" "vpn_ip" {
+  instance = aws_instance.vm.id
+  domain   = "vpc"
+}
+
+output "vpn_public_ip" {
+  value = aws_eip.vpn_ip.public_ip
+}
+
 resource "aws_security_group" "vm_sg" {
   name        = "${vm_name}-sg"
   description = "Allow SSH, VNC & RDP access"
@@ -56,20 +65,27 @@ resource "aws_security_group" "vm_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  
+    cidr_blocks = ["${vpn_ip}"]  
   }
 
   ingress {
     from_port   = 5900
     to_port     = 5900
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  
+    cidr_blocks = ["${vpn_ip}"]  
   }
 
   ingress {
     from_port   = 3389
     to_port     = 3389
     protocol    = "tcp"
+    cidr_blocks = ["${vpn_ip}"]  
+  }
+
+  ingress {
+    from_port   = 1194
+    to_port     = 1194
+    protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]  
   }
 
@@ -77,8 +93,9 @@ resource "aws_security_group" "vm_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${vpn_ip}"]
   }
+
 }
 `;
 

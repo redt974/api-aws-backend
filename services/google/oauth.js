@@ -35,7 +35,7 @@ router.get('/', async function (req, res) {
           <p>Vous avez refusé l'accès à votre compte Google. Veuillez réessayer.</p>
           <script>
             setTimeout(() => {
-              window.location.href = 'https://${process.env.FRONT_URL}';
+              window.location.href = 'http://${process.env.FRONT_URL}';
             }, 5000);
           </script>
         </body>
@@ -44,7 +44,7 @@ router.get('/', async function (req, res) {
   }
 
   try {
-    const redirectURL = `https://${process.env.BACK_URL}/google/oauth`;
+    const redirectURL = `http://${process.env.BACK_URL}/google/oauth`;
     const oAuth2Client = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
@@ -75,7 +75,7 @@ router.get('/', async function (req, res) {
             <p>Vous devez vous inscrire pour accéder à ce service.</p>
             <script>
               setTimeout(() => {
-                window.location.href = 'https://${process.env.FRONT_URL}/inscription';
+                window.location.href = 'http://${process.env.FRONT_URL}/inscription';
               }, 5000);
             </script>
           </body>
@@ -84,16 +84,16 @@ router.get('/', async function (req, res) {
     }
 
     // Récupérer l'ID de l'utilisateur
-    const userId = existingUser[0].id;
+    const id = existingUser[0].id;
 
     // Vérifiez si l'email est celui du propriétaire et attribuez un rôle admin
     const isAdmin = isOwnerEmail(userData.email);
 
     // Générer un token JWT pour authentifier l'utilisateur
-    const token = jwt.sign({ userId, isAdmin }, secretKey, { expiresIn: '30m' });
+    const token = jwt.sign({ id, isAdmin }, secretKey, { expiresIn: '30m' });
 
     // Rediriger vers le frontend avec le token JWT
-    res.redirect(303, `https://${process.env.FRONT_URL}/auth/google/redirect?token=${token}`);
+    res.redirect(303, `http://${process.env.FRONT_URL}/auth/google/redirect?token=${token}`);
     
   } catch (err) {
     console.error('Error during OAuth2 process:', err);

@@ -94,7 +94,7 @@ const extractAnsibleTasks = (output) => {
 };
 
 // Fonction pour exécuter le playbook Ansible
-const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions, user_name, user_email, instance_id, user_password, privateKeyPath, public_ip, emitProgress) => {
+const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions, user_name, user_email, instance_id, user_password, vpn_ip, privateKeyPath, public_ip, emitProgress) => {
   try {
     // Vérifiez que la VM est prête
     await isVMReady({ public_ip, user_name, user_email, instance_id, ssh_private_key: privateKeyPath });
@@ -105,6 +105,7 @@ const runAnsiblePlaybook = async (inventoryPath, playbook, software, extensions,
       vscode_extensions: extensions,
       ansible_user: user_name,
       user_password: user_password,
+      vpn_ip: vpn_ip,
     });
 
     // Construction de la commande Ansible avec redirection des logs

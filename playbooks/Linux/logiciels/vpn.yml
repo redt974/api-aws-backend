@@ -1,0 +1,81 @@
+---
+- name: Installer OpenVPN et Easy-RSA
+  ansible.builtin.apt:
+    name:
+      - openvpn
+      - easy-rsa
+    state: present
+    update_cache: yes
+
+- name: Copier les fichiers de configuration OpenVPN
+  ansible.builtin.copy:
+    src: /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz
+    dest: /etc/openvpn/server.conf.gz
+    remote_src: yes
+
+- name: Décompresser la configuration OpenVPN
+  ansible.builtin.command:
+    cmd: gunzip -f /etc/openvpn/server.conf.gz
+  args:
+    creates: /etc/openvpn/server.conf
+
+- name: Configurer le sous-réseau VPN avec l'IP définie dans `common.yml`
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    regexp: '^server '
+    line: "server {{ vpn_ip }} 255.255.255.0"
+
+- name: Modifier la configuration OpenVPN
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^;tls-auth ta.key 0', line: 'tls-auth ta.key 0' }
+    - { regexp: '^cipher AES-256-CBC', line: 'cipher AES-256-GCM' }
+    - { regexp: '^;user nobody', line: 'user nobody' }
+    - { regexp: '^;group nogroup', line: 'group nogroup' }
+    - { regexp: '^;duplicate-cn', line: 'duplicate-cn' }
+
+- name: Activer le routage IPv4
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^#net.ipv4.ip_forward=1'
+    line: 'net.ipv4.ip_forward=1'
+
+- name: Appliquer les modifications de sysctl
+  ansible.builtin.command: sysctl -p
+
+- name: Démarrer et activer OpenVPN
+  ansible.builtin.systemd:
+    name: openvpn@server
+    state: started
+    enabled: yes
+
+- name: Générer les certificats OpenVPN
+  ansible.builtin.shell: |
+    make-cadir /etc/openvpn/easy-rsa
+    cd /etc/openvpn/easy-rsa
+    ./easyrsa init-pki
+    echo "yes" | ./easyrsa build-ca nopass
+    ./easyrsa gen-req server nopass
+    echo "yes" | ./easyrsa sign-req server server
+    ./easyrsa gen-dh
+    openvpn --genkey --secret ta.key
+    cp pki/ca.crt pki/issued/server.crt pki/private/server.key ta.key /etc/openvpn/
+  args:
+    creates: /etc/openvpn/ta.key
+
+- name: Générer un client OpenVPN
+  ansible.builtin.shell: |
+    cd /etc/openvpn/easy-rsa
+    ./easyrsa gen-req client1 nopass
+    echo "yes" | ./easyrsa sign-req client client1
+    cp pki/ca.crt pki/issued/client1.crt pki/private/client1.key ta.key /etc/openvpn/client/
+  args:
+    creates: /etc/openvpn/client/client1.key
+
+- name: Créer le fichier de configuration client OpenVPN
+  ansible.builtin.template:
+    src: openvpn-client.conf.j2
+    dest: /etc/openvpn/client/client1.ovpn
